@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -60,6 +61,11 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public DcMotor  rightFront  = null;
     public DcMotor  leftRear    = null;
     public DcMotor  rightRear   = null;
+    public DcMotor leftLinearSlide = null;
+    public DcMotor rightLinearSlide = null;
+    public DcMotor upperJoint = null;
+    public DcMotor lowerJoint = null;
+
     private ElapsedTime runtime = new ElapsedTime();
 
 
@@ -69,14 +75,25 @@ public class RobotTeleopMecanumDrive extends OpMode{
     @Override
     public void init() {
         // Define and Initialize Motors
+
+        //TODO: set up hardwareMap
+        //drive base
         leftFront  = hardwareMap.get(DcMotor.class, "left_front_drive");
         rightFront = hardwareMap.get(DcMotor.class, "right_front_drive");
         leftRear = hardwareMap.get(DcMotor.class, "left_rear_drive");
         rightRear = hardwareMap.get(DcMotor.class, "right_rear_drive");
 
+        //arm
+        leftLinearSlide = hardwareMap.get(DcMotor.class, "left_linear_slide");
+        rightLinearSlide = hardwareMap.get(DcMotor.class, "right_linear_slide");
+
+
+
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left and right sticks forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
+
+        //this needs to be corrected with testing, this is just and example
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         leftRear.setDirection(DcMotor.Direction.REVERSE);
@@ -122,6 +139,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
         rightDrive.setPower(right);
          */
 
+        // Using trig to set the motor speeds so that the bot can move in all directions
         double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
         double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
         double rightX = gamepad1.right_stick_x;
@@ -135,12 +153,35 @@ public class RobotTeleopMecanumDrive extends OpMode{
         leftRear.setPower(v3);
         rightRear.setPower(v4);
 
+        //arm controls
+        final double upprjnt = gamepad2.left_stick_y;
+        final double lwrjnt = gamepad2.right_stick_y;
+        //speed clamp reduces the voltage of the motors by a set percentage
+        // TODO:should be adjusted with testing
+        final double jointSpeedMultiplier = 0.3;
+
+        upperJoint.setPower(upprjnt * jointSpeedMultiplier);
+        lowerJoint.setPower(lwrjnt * jointSpeedMultiplier);
+
+
+        //linearSlideSpeed is the voltage which we give to the linear slide motors (adjusts the speed the linear slide goes up and down)
+        //TODO: should be adjusted with testing
+        final double linearSlideSpeed = 0.3;
+
+        if(gamepad2.dpad_up) {
+            leftLinearSlide.setPower(linearSlideSpeed);
+            rightLinearSlide.setPower(linearSlideSpeed);
+        } else if(gamepad2.dpad_down){
+            leftLinearSlide.setPower(-linearSlideSpeed);
+            rightLinearSlide.setPower(-linearSlideSpeed);
+        }
+
         telemetry.addData("leftFront",  "%.2f", v1);
         telemetry.addData("rightFront",  "%.2f", v2);
         telemetry.addData("leftRear",  "%.2f", v3);
         telemetry.addData("rightRear", "%.2f", v4);
 
-
+        // using the run time to display the amount of time remaining in the game mode
         if(runtime.seconds() < 120)
             telemetry.addData("Time Left in Normal Mode", "%4.1f S", (120 - runtime.seconds()));
         else
