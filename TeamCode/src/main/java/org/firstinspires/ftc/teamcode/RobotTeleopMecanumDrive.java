@@ -63,8 +63,9 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public DcMotor  rightRear   = null;
     public DcMotor leftLinearSlide = null;
     public DcMotor rightLinearSlide = null;
-    public DcMotor upperJoint = null;
-    public DcMotor lowerJoint = null;
+    public DcMotor upperArmJoint = null;
+    public DcMotor lowerArmJoint = null;
+    public DcMotor rootArmJoint = null;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -76,7 +77,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public void init() {
         // Define and Initialize Motors
 
-        //TODO: set up hardwareMap
+        //TODO: Set up hardwareMap
         //drive base
         leftFront  = hardwareMap.get(DcMotor.class, "left_front_drive");
         rightFront = hardwareMap.get(DcMotor.class, "right_front_drive");
@@ -87,7 +88,9 @@ public class RobotTeleopMecanumDrive extends OpMode{
         leftLinearSlide = hardwareMap.get(DcMotor.class, "left_linear_slide");
         rightLinearSlide = hardwareMap.get(DcMotor.class, "right_linear_slide");
 
-
+        upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
+        upperArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
+        rootArmJoint = hardwareMap.get(DcMotor.class, "root_arm_joint");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left and right sticks forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -120,68 +123,57 @@ public class RobotTeleopMecanumDrive extends OpMode{
     @Override
     public void start() {}
 
+    public void wheelMovementLoop() {
+        // Using trig to set the motor speeds so that the bot can move in all directions
+        double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
+        double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
+        double rightX = gamepad1.right_stick_x;
+
+        double leftFrontWheelPower = r * Math.cos(robotAngle) + rightX;
+        double rightFrontWheelPower = r * Math.sin(robotAngle) - rightX;
+        double leftRearWheelPower = r * Math.sin(robotAngle) + rightX;
+        double rightRearWheelPower = r * Math.cos(robotAngle) - rightX;
+
+        leftFront.setPower(leftFrontWheelPower);
+        rightFront.setPower(rightFrontWheelPower);
+        leftRear.setPower(leftRearWheelPower);
+        rightRear.setPower(rightRearWheelPower);
+
+        telemetry.addData("leftFront",  "%.2f", leftFrontWheelPower);
+        telemetry.addData("rightFront",  "%.2f", rightFrontWheelPower);
+        telemetry.addData("leftRear",  "%.2f", leftRearWheelPower);
+        telemetry.addData("rightRear", "%.2f", rightRearWheelPower);
+    }
+
+    public void armMovementLoop() {
+        double upperArmJointPower = gamepad2.left_stick_y;
+        double lowerArmJointPower = gamepad2.right_stick_y;
+
+        double jointSpeedDamp = 0.3;
+        double linearSpeedPower = 0.3;
+
+        upperArmJoint.setPower(upperArmJointPower * jointSpeedDamp);
+        lowerArmJoint.setPower(lowerArmJointPower * jointSpeedDamp);
+
+        if(gamepad2.dpad_up) {
+            leftLinearSlide.setPower(linearSpeedPower);
+            rightLinearSlide.setPower(linearSpeedPower);
+        } else if(gamepad2.dpad_down){
+            leftLinearSlide.setPower(-linearSpeedPower);
+            rightLinearSlide.setPower(-linearSpeedPower);
+        }
+    }
+
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
     @Override
     public void loop() {
 
+        wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
+        armMovementLoop(); // Control the movement of the arm claw using gamepad2
 
-        // Run wheels in tank mode (note: The joystick goes negative when pushed forward, so negate it)
-        /*
-        double left;
-        double right;
-
-        left = -gamepad1.left_stick_y;
-        right = -gamepad1.right_stick_y;
-
-        leftDrive.setPower(left);
-        rightDrive.setPower(right);
-         */
-
-        // Using trig to set the motor speeds so that the bot can move in all directions
-        double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
-        double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
-        double rightX = gamepad1.right_stick_x;
-        final double v1 = r * Math.cos(robotAngle) + rightX;
-        final double v2 = r * Math.sin(robotAngle) - rightX;
-        final double v3 = r * Math.sin(robotAngle) + rightX;
-        final double v4 = r * Math.cos(robotAngle) - rightX;
-
-        leftFront.setPower(v1);
-        rightFront.setPower(v2);
-        leftRear.setPower(v3);
-        rightRear.setPower(v4);
-
-        //arm controls
-        final double upprjnt = gamepad2.left_stick_y;
-        final double lwrjnt = gamepad2.right_stick_y;
-        //speed clamp reduces the voltage of the motors by a set percentage
-        // TODO:should be adjusted with testing
-        final double jointSpeedMultiplier = 0.3;
-
-        upperJoint.setPower(upprjnt * jointSpeedMultiplier);
-        lowerJoint.setPower(lwrjnt * jointSpeedMultiplier);
-
-
-        //linearSlideSpeed is the voltage which we give to the linear slide motors (adjusts the speed the linear slide goes up and down)
-        //TODO: should be adjusted with testing
-        final double linearSlideSpeed = 0.3;
-
-        if(gamepad2.dpad_up) {
-            leftLinearSlide.setPower(linearSlideSpeed);
-            rightLinearSlide.setPower(linearSlideSpeed);
-        } else if(gamepad2.dpad_down){
-            leftLinearSlide.setPower(-linearSlideSpeed);
-            rightLinearSlide.setPower(-linearSlideSpeed);
-        }
-
-        telemetry.addData("leftFront",  "%.2f", v1);
-        telemetry.addData("rightFront",  "%.2f", v2);
-        telemetry.addData("leftRear",  "%.2f", v3);
-        telemetry.addData("rightRear", "%.2f", v4);
-
-        // using the run time to display the amount of time remaining in the game mode
+        // Using the run time to display the amount of time remaining in the game mode
         if(runtime.seconds() < 120)
             telemetry.addData("Time Left in Normal Mode", "%4.1f S", (120 - runtime.seconds()));
         else
