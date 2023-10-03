@@ -57,10 +57,10 @@ public class RobotTeleopMecanumDrive extends OpMode{
 
     /* Declare OpMode members. */
 
-    public DcMotor  leftFront   = null;
-    public DcMotor  rightFront  = null;
-    public DcMotor  leftRear    = null;
-    public DcMotor  rightRear   = null;
+    public DcMotor  frontLeft   = null;
+    public DcMotor  frontRight  = null;
+    public DcMotor  rearLeft    = null;
+    public DcMotor  rearRight   = null;
     public DcMotor leftLinearSlide = null;
     public DcMotor rightLinearSlide = null;
     public DcMotor upperArmJoint = null;
@@ -79,10 +79,10 @@ public class RobotTeleopMecanumDrive extends OpMode{
 
         //TODO: Set up hardwareMap
         //drive base
-        leftFront  = hardwareMap.get(DcMotor.class, "left_front_drive");
-        rightFront = hardwareMap.get(DcMotor.class, "right_front_drive");
-        leftRear = hardwareMap.get(DcMotor.class, "left_rear_drive");
-        rightRear = hardwareMap.get(DcMotor.class, "right_rear_drive");
+        frontLeft  = hardwareMap.get(DcMotor.class, "left_front_drive");
+        frontRight = hardwareMap.get(DcMotor.class, "right_front_drive");
+        rearLeft = hardwareMap.get(DcMotor.class, "left_rear_drive");
+        rearRight = hardwareMap.get(DcMotor.class, "right_rear_drive");
 
         //arm
         leftLinearSlide = hardwareMap.get(DcMotor.class, "left_linear_slide");
@@ -97,10 +97,10 @@ public class RobotTeleopMecanumDrive extends OpMode{
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
 
         //this needs to be corrected with testing, this is just and example
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        rightFront.setDirection(DcMotor.Direction.FORWARD);
-        leftRear.setDirection(DcMotor.Direction.REVERSE);
-        rightRear.setDirection(DcMotor.Direction.FORWARD);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        rearLeft.setDirection(DcMotor.Direction.REVERSE);
+        rearRight.setDirection(DcMotor.Direction.FORWARD);
 
         // If there are encoders connected, switch to RUN_USING_ENCODER mode for greater accuracy
         // leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -134,10 +134,10 @@ public class RobotTeleopMecanumDrive extends OpMode{
         double leftRearWheelPower = r * Math.sin(robotAngle) + rightX;
         double rightRearWheelPower = r * Math.cos(robotAngle) - rightX;
 
-        leftFront.setPower(leftFrontWheelPower);
-        rightFront.setPower(rightFrontWheelPower);
-        leftRear.setPower(leftRearWheelPower);
-        rightRear.setPower(rightRearWheelPower);
+        frontLeft.setPower(leftFrontWheelPower);
+        frontRight.setPower(rightFrontWheelPower);
+        rearLeft.setPower(leftRearWheelPower);
+        rearRight.setPower(rightRearWheelPower);
 
         telemetry.addData("leftFront",  "%.2f", leftFrontWheelPower);
         telemetry.addData("rightFront",  "%.2f", rightFrontWheelPower);
