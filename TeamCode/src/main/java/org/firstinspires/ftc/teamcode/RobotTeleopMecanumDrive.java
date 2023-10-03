@@ -89,7 +89,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
         rightLinearSlide = hardwareMap.get(DcMotor.class, "right_linear_slide");
 
         upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
-        upperArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
+        lowerArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
         rootArmJoint = hardwareMap.get(DcMotor.class, "root_arm_joint");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
