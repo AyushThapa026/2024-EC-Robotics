@@ -51,8 +51,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Robot: Teleop Tank", group="Robot")
-@Disabled
+@TeleOp(name="Robot: Teleop", group="Robot")
 public class RobotTeleopMecanumDrive extends OpMode{
 
     /* Declare OpMode members. */
@@ -85,12 +84,12 @@ public class RobotTeleopMecanumDrive extends OpMode{
         rearRight = hardwareMap.get(DcMotor.class, "right_rear_drive");
 
         //arm
-        leftLinearSlide = hardwareMap.get(DcMotor.class, "left_linear_slide");
-        rightLinearSlide = hardwareMap.get(DcMotor.class, "right_linear_slide");
+        //leftLinearSlide = hardwareMap.get(DcMotor.class, "left_linear_slide");
+        //rightLinearSlide = hardwareMap.get(DcMotor.class, "right_linear_slide");
 
-        upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
-        upperArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
-        rootArmJoint = hardwareMap.get(DcMotor.class, "root_arm_joint");
+        //upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
+        //upperArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
+        //rootArmJoint = hardwareMap.get(DcMotor.class, "root_arm_joint");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left and right sticks forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -126,7 +125,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public void wheelMovementLoop() {
         // Using trig to set the motor speeds so that the bot can move in all directions
         double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
-        double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
+        double robotAngle = Math.atan2(-    gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
         double rightX = gamepad1.right_stick_x;
 
         double leftFrontWheelPower = r * Math.cos(robotAngle) + rightX;
@@ -171,7 +170,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public void loop() {
 
         wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
-        armMovementLoop(); // Control the movement of the arm claw using gamepad2
+        //armMovementLoop(); // Control the movement of the arm claw using gamepad2
 
         // Using the run time to display the amount of time remaining in the game mode
         if(runtime.seconds() < 120)
