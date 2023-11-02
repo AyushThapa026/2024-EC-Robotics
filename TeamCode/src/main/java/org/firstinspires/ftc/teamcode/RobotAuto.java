@@ -99,6 +99,8 @@ public class RobotAuto extends LinearOpMode {
         frontRight = hardwareMap.get(DcMotor.class, "right_front_drive");
         rearLeft = hardwareMap.get(DcMotor.class, "left_rear_drive");
         rearRight = hardwareMap.get(DcMotor.class, "right_rear_drive");
+        upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
+        lowerArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -112,11 +114,15 @@ public class RobotAuto extends LinearOpMode {
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        upperArmJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lowerArmJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        upperArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lowerArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Starting at",  "%7d :%7d",
