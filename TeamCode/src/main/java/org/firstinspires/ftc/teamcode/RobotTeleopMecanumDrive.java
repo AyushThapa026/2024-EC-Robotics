@@ -78,17 +78,18 @@ public class RobotTeleopMecanumDrive extends OpMode{
 
         //TODO: Set up hardwareMap
         //drive base
-        frontLeft  = hardwareMap.get(DcMotor.class, "left_front_drive");
-        frontRight = hardwareMap.get(DcMotor.class, "right_front_drive");
-        rearLeft = hardwareMap.get(DcMotor.class, "left_rear_drive");
-        rearRight = hardwareMap.get(DcMotor.class, "right_rear_drive");
+
+        frontLeft  = hardwareMap.dcMotor.get("left_front_drive");
+        frontRight = hardwareMap.dcMotor.get("right_front_drive");
+        rearLeft = hardwareMap.dcMotor.get("left_rear_drive");
+        rearRight = hardwareMap.dcMotor.get("right_rear_drive");
 
         //arm
         //leftLinearSlide = hardwareMap.get(DcMotor.class, "left_linear_slide");
         //rightLinearSlide = hardwareMap.get(DcMotor.class, "right_linear_slide");
 
-        upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
-        lowerArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
+        upperArmJoint = hardwareMap.dcMotor.get("arm_upper_joint");
+        lowerArmJoint = hardwareMap.dcMotor.get("arm_lower_joint");
         //rootArmJoint = hardwareMap.get(DcMotor.class, "root_arm_joint");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
@@ -149,19 +150,10 @@ public class RobotTeleopMecanumDrive extends OpMode{
         double lowerArmJointPower = gamepad2.right_stick_y;
 
         double jointSpeedDamp = 0.3;
-        double linearSpeedPower = 0.3;
+        //double linearSpeedPower = 0.3;
 
         upperArmJoint.setPower(upperArmJointPower * jointSpeedDamp);
         lowerArmJoint.setPower(lowerArmJointPower * jointSpeedDamp);
-        /*
-        if(gamepad2.dpad_up) {
-            leftLinearSlide.setPower(linearSpeedPower);
-            rightLinearSlide.setPower(linearSpeedPower);
-        } else if(gamepad2.dpad_down){
-            leftLinearSlide.setPower(-linearSpeedPower);
-            rightLinearSlide.setPower(-linearSpeedPower);
-        }
-         */
     }
 
     /*

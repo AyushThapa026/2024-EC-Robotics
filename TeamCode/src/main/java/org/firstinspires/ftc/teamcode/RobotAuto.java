@@ -146,6 +146,54 @@ public class RobotAuto extends LinearOpMode {
         sleep(1000);  // pause to display final telemetry message.
     }
 
+    public void turn(double radians){
+        encoderDrive(TURN_SPEED, -(radians * Math.sqrt(550)) / 2.54, (radians * Math.sqrt(550)) / 2.54, 1000);
+    }
+
+    public void move(double inches){
+        encoderDrive(DRIVE_SPEED, inches, inches, 1000);
+    }
+
+    private double radiansToCounts(double r) {
+        return (COUNTS_PER_MOTOR_REV / (2 * Math.PI)) * r;
+    }
+
+    public void encoderArm(double upperJointRadians, double lowerJointRadians, double speed,
+                           double timeoutS) {
+        if (opModeIsActive()) {
+            int upperJointCounts = (int) radiansToCounts(upperJointRadians);
+            int lowerJointCounts = (int) radiansToCounts(lowerJointRadians);
+
+            int targetUpperArmPosition = upperArmJoint.getCurrentPosition() + upperJointCounts;
+            int targetLowerArmPosition = lowerArmJoint.getCurrentPosition() + lowerJointCounts;
+            upperArmJoint.setTargetPosition(targetUpperArmPosition);
+            lowerArmJoint.setTargetPosition(targetLowerArmPosition);
+
+            upperArmJoint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lowerArmJoint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            runtime.reset();
+            upperArmJoint.setPower(Math.abs(speed));
+            lowerArmJoint.setPower(Math.abs(speed));
+
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (frontLeft.isBusy() && frontRight.isBusy() && rearRight.isBusy() && rearLeft.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Running to",  " %7d :%7d", upperJointCounts,  lowerJointCounts);
+                telemetry.addData("Currently at",  " at %7d :%7d",
+                        frontLeft.getCurrentPosition(), frontRight.getCurrentPosition());
+                telemetry.update();
+            }
+
+            upperArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            lowerArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            sleep(250);   // optional pause after each move.
+        }
+    }
+
     /*
      *  Method to perform a relative move, based on encoder counts.
      *  Encoders are not reset as the move is based on the current position.
