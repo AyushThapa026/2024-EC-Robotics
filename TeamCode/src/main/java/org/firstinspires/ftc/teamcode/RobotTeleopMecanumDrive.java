@@ -87,8 +87,8 @@ public class RobotTeleopMecanumDrive extends OpMode{
         //leftLinearSlide = hardwareMap.get(DcMotor.class, "left_linear_slide");
         //rightLinearSlide = hardwareMap.get(DcMotor.class, "right_linear_slide");
 
-        //upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
-        //upperArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
+        upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
+        lowerArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
         //rootArmJoint = hardwareMap.get(DcMotor.class, "root_arm_joint");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
@@ -153,7 +153,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
 
         upperArmJoint.setPower(upperArmJointPower * jointSpeedDamp);
         lowerArmJoint.setPower(lowerArmJointPower * jointSpeedDamp);
-
+        /*
         if(gamepad2.dpad_up) {
             leftLinearSlide.setPower(linearSpeedPower);
             rightLinearSlide.setPower(linearSpeedPower);
@@ -161,6 +161,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
             leftLinearSlide.setPower(-linearSpeedPower);
             rightLinearSlide.setPower(-linearSpeedPower);
         }
+         */
     }
 
     /*
@@ -170,7 +171,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public void loop() {
 
         wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
-        //armMovementLoop(); // Control the movement of the arm claw using gamepad2
+        armMovementLoop(); // Control the movement of the arm claw using gamepad2
 
         // Using the run time to display the amount of time remaining in the game mode
         if(runtime.seconds() < 120)
