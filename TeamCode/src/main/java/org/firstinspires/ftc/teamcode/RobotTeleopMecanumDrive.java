@@ -62,6 +62,10 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public DcMotor  rearRight   = null;
     public DcMotor leftLinearSlide = null;
     public DcMotor rightLinearSlide = null;
+
+    public Servo clawRotation = null;
+
+    public Servo claw = null;
     public DcMotor upperArmJoint = null;
     public DcMotor lowerArmJoint = null;
     public DcMotor rootArmJoint = null;
@@ -90,6 +94,8 @@ public class RobotTeleopMecanumDrive extends OpMode{
 
         upperArmJoint = hardwareMap.dcMotor.get("arm_upper_joint");
         lowerArmJoint = hardwareMap.dcMotor.get("arm_lower_joint");
+        clawRotation = hardwareMap.servo.get("claw_rotation");
+        claw = hardwareMap.servo.get("claw_controller");
         //rootArmJoint = hardwareMap.get(DcMotor.class, "root_arm_joint");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
@@ -129,10 +135,10 @@ public class RobotTeleopMecanumDrive extends OpMode{
         double robotAngle = Math.atan2(-    gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
         double rightX = gamepad1.right_stick_x;
 
-        double leftFrontWheelPower = r * Math.cos(robotAngle) + rightX;
-        double rightFrontWheelPower = r * Math.sin(robotAngle) - rightX;
-        double leftRearWheelPower = r * Math.sin(robotAngle) + rightX;
-        double rightRearWheelPower = r * Math.cos(robotAngle) - rightX;
+        double leftFrontWheelPower = r * Math.cos(robotAngle) * Math.sqrt(2) + rightX;
+        double rightFrontWheelPower = r * Math.sin(robotAngle) * Math.sqrt(2) - rightX;
+        double leftRearWheelPower = r * Math.sin(robotAngle) * Math.sqrt(2) + rightX;
+        double rightRearWheelPower = r * Math.cos(robotAngle) * Math.sqrt(2) - rightX;
 
         frontLeft.setPower(leftFrontWheelPower);
         frontRight.setPower(rightFrontWheelPower);
@@ -154,6 +160,29 @@ public class RobotTeleopMecanumDrive extends OpMode{
 
         upperArmJoint.setPower(upperArmJointPower * jointSpeedDamp);
         lowerArmJoint.setPower(lowerArmJointPower * jointSpeedDamp);
+        /*
+        if(gamepad1.dpad_up) {
+            leftLinearSlide.setPower(linearSpeedPower);
+            rightLinearSlide.setPower(linearSpeedPower);
+        } else if(gamepad1.dpad_down){
+            leftLinearSlide.setPower(-linearSpeedPower);
+            rightLinearSlide.setPower(-linearSpeedPower);
+        }
+
+
+         */
+        if(gamepad2.dpad_up)
+            clawRotation.setPosition(clawRotation.getPosition()+0.02);
+        else if(gamepad2.dpad_down)
+            clawRotation.setPosition(clawRotation.getPosition()-0.02);
+
+        
+        if(gamepad2.a)
+            claw.setPosition(1);
+        else if (gamepad1.b)
+            claw.setPosition(1/6.0);
+        else if (gamepad1.x)
+            claw.setPosition(5/6.0);
     }
 
     /*
