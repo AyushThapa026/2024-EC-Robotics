@@ -89,8 +89,8 @@ public class RobotTeleopMecanumDrive extends OpMode{
         rearRight = hardwareMap.dcMotor.get("right_rear_drive");
 
         //arm
-        //leftLinearSlide = hardwareMap.get(DcMotor.class, "left_linear_slide");
-        //rightLinearSlide = hardwareMap.get(DcMotor.class, "right_linear_slide");
+        leftLinearSlide = hardwareMap.get(DcMotor.class, "left_linear_slide");
+        rightLinearSlide = hardwareMap.get(DcMotor.class, "right_linear_slide");
 
         upperArmJoint = hardwareMap.dcMotor.get("arm_upper_joint");
         lowerArmJoint = hardwareMap.dcMotor.get("arm_lower_joint");
@@ -156,11 +156,11 @@ public class RobotTeleopMecanumDrive extends OpMode{
         double lowerArmJointPower = gamepad2.right_stick_y;
 
         double jointSpeedDamp = 0.3;
-        //double linearSpeedPower = 0.3;
+        double linearSpeedPower = 0.3;
 
         upperArmJoint.setPower(upperArmJointPower * jointSpeedDamp);
         lowerArmJoint.setPower(lowerArmJointPower * jointSpeedDamp);
-        /*
+
         if(gamepad1.dpad_up) {
             leftLinearSlide.setPower(linearSpeedPower);
             rightLinearSlide.setPower(linearSpeedPower);
@@ -170,19 +170,21 @@ public class RobotTeleopMecanumDrive extends OpMode{
         }
 
 
-         */
+
         if(gamepad2.dpad_up)
             clawRotation.setPosition(clawRotation.getPosition()+0.02);
         else if(gamepad2.dpad_down)
             clawRotation.setPosition(clawRotation.getPosition()-0.02);
 
-        
+
         if(gamepad2.a)
             claw.setPosition(1);
         else if (gamepad1.b)
             claw.setPosition(1/6.0);
         else if (gamepad1.x)
             claw.setPosition(5/6.0);
+        else if (gamepad1.y)
+            claw.setPosition(0);
     }
 
     /*
