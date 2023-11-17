@@ -97,6 +97,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
         clawRotation = hardwareMap.servo.get("claw_rotation");
         claw = hardwareMap.servo.get("claw_controller");
         //rootArmJoint = hardwareMap.get(DcMotor.class, "root_arm_joint");
+        //launcherServo = hardwareMap.get(DcMotor.class, "launcher_servo");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left and right sticks forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -186,6 +187,14 @@ public class RobotTeleopMecanumDrive extends OpMode{
         else if (gamepad1.y)
             claw.setPosition(0);
     }
+
+    /*
+    public void launcherLoop(){
+        if(gamepad.button){
+             launcherServo.setPower(1);
+        }
+     }
+     */
 
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
