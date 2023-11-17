@@ -206,6 +206,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
 
         wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
         armMovementLoop(); // Control the movement of the arm claw using gamepad2
+        //launcherLoop();
 
         // Using the run time to display the amount of time remaining in the game mode
         if(runtime.seconds() < 120)
