@@ -34,9 +34,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.*;
 
 /*
  * This OpMode executes a Tank Drive control TeleOp a direct drive robot
@@ -87,7 +89,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
         frontRight = hardwareMap.dcMotor.get("right_front_drive");
         rearLeft = hardwareMap.dcMotor.get("left_rear_drive");
         rearRight = hardwareMap.dcMotor.get("right_rear_drive");
-
+        /*
         //arm
         leftLinearSlide = hardwareMap.get(DcMotor.class, "left_linear_slide");
         rightLinearSlide = hardwareMap.get(DcMotor.class, "right_linear_slide");
@@ -97,17 +99,20 @@ public class RobotTeleopMecanumDrive extends OpMode{
         clawRotation = hardwareMap.servo.get("claw_rotation");
         claw = hardwareMap.servo.get("claw_controller");
         //rootArmJoint = hardwareMap.get(DcMotor.class, "root_arm_joint");
-
+        */
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left and right sticks forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
 
         //this needs to be corrected with testing, this is just and example
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        rearLeft.setDirection(DcMotor.Direction.REVERSE);
-        rearRight.setDirection(DcMotor.Direction.FORWARD);
-
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        rearLeft.setDirection(DcMotor.Direction.FORWARD);
+        rearRight.setDirection(DcMotor.Direction.REVERSE);
+        /*
+        leftLinearSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightLinearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
+        */
         // If there are encoders connected, switch to RUN_USING_ENCODER mode for greater accuracy
         // leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -121,6 +126,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
      */
     @Override
     public void init_loop() {
+
     }
 
     /*
@@ -132,7 +138,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public void wheelMovementLoop() {
         // Using trig to set the motor speeds so that the bot can move in all directions
         double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
-        double robotAngle = Math.atan2(-    gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
+        double robotAngle = Math.atan2(-gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
         double rightX = gamepad1.right_stick_x;
 
         double leftFrontWheelPower = r * Math.cos(robotAngle) * Math.sqrt(2) + rightX;
@@ -167,24 +173,31 @@ public class RobotTeleopMecanumDrive extends OpMode{
         } else if(gamepad1.dpad_down){
             leftLinearSlide.setPower(-linearSpeedPower);
             rightLinearSlide.setPower(-linearSpeedPower);
+        } else if(gamepad1.dpad_left){
+            leftLinearSlide.setPower(0);
+            rightLinearSlide.setPower(0);
         }
 
 
 
         if(gamepad2.dpad_up)
-            clawRotation.setPosition(clawRotation.getPosition()+0.02);
+            clawRotation.setPosition(clawRotation.getPosition()+0.0002);
         else if(gamepad2.dpad_down)
-            clawRotation.setPosition(clawRotation.getPosition()-0.02);
-
+            clawRotation.setPosition(clawRotation.getPosition()-0.0002);
+        else if (gamepad2.dpad_left) {
+            clawRotation.setPosition(clawRotation.getPosition());
+        }
+        telemetry.addData("claw rotation:", clawRotation.getPosition());
 
         if(gamepad2.a)
-            claw.setPosition(1);
-        else if (gamepad1.b)
+            claw.setPosition(1.0);
+        else if (gamepad2.b)
             claw.setPosition(1/6.0);
-        else if (gamepad1.x)
+        else if (gamepad2.x)
             claw.setPosition(5/6.0);
-        else if (gamepad1.y)
-            claw.setPosition(0);
+        else if (gamepad2.y)
+            claw.setPosition(0.0);
+        telemetry.addData("claw controller:", claw.getPosition());
     }
 
     /*
@@ -194,7 +207,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public void loop() {
 
         wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
-        armMovementLoop(); // Control the movement of the arm claw using gamepad2
+        //armMovementLoop(); // Control the movement of the arm claw using gamepad2
 
         // Using the run time to display the amount of time remaining in the game mode
         if(runtime.seconds() < 120)
