@@ -83,13 +83,13 @@ public class RobotAuto extends LinearOpMode {
     // For example, use a value of 2.0 for a 12-tooth spur gear driving a 24-tooth spur gear.
     // This is gearing DOWN for less speed and more torque.
     // For gearing UP, use a gear ratio less than 1.0. Note this will affect the direction of wheel rotation.
-    static final double     COUNTS_PER_MOTOR_REV    = 537.7*4;    // eg: TETRIX Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 1.0;     // No External Gearing.
-    static final double     WHEEL_DIAMETER_INCHES   = 3.77953;     // For figuring circumference
+    static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // No External Gearing.
+    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.3;
-    static final double     TURN_SPEED              = 0.3;
+    static final double     DRIVE_SPEED             = 0.6;
+    static final double     TURN_SPEED              = 0.5;
 
     @Override
     public void runOpMode() {
@@ -99,30 +99,30 @@ public class RobotAuto extends LinearOpMode {
         frontRight = hardwareMap.get(DcMotor.class, "right_front_drive");
         rearLeft = hardwareMap.get(DcMotor.class, "left_rear_drive");
         rearRight = hardwareMap.get(DcMotor.class, "right_rear_drive");
-        //upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
-        //lowerArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
+        upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
+        lowerArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        frontLeft.setDirection(DcMotor.Direction.FORWARD);
-        frontRight.setDirection(DcMotor.Direction.REVERSE);
-        rearLeft.setDirection(DcMotor.Direction.FORWARD);
-        rearRight.setDirection(DcMotor.Direction.REVERSE);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        rearLeft.setDirection(DcMotor.Direction.REVERSE);
+        rearRight.setDirection(DcMotor.Direction.FORWARD);
 
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //upperArmJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //lowerArmJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        upperArmJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lowerArmJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         upperArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //lowerArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lowerArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Starting at",  "%7d :%7d",
@@ -137,16 +137,9 @@ public class RobotAuto extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        //encoderDrive(DRIVE_SPEED,  48,  48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-        //encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-        //encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
-        sleep(500);
-        move(30);
-        //sleep(100);
-        turn(Math.PI);
-        //sleep(100);
-        move(30);
-
+        encoderDrive(DRIVE_SPEED,  48,  48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+        encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+        encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -154,18 +147,17 @@ public class RobotAuto extends LinearOpMode {
     }
 
     public void turn(double radians){
-        encoderDrive(TURN_SPEED, -(radians * 20.043971751969), (radians * 20.043971751969), 1000);
+        encoderDrive(TURN_SPEED, -(radians * Math.sqrt(550)) / 2.54, (radians * Math.sqrt(550)) / 2.54, 1000);
     }
 
     public void move(double inches){
-        encoderDrive(DRIVE_SPEED, inches, inches, 30);
+        encoderDrive(DRIVE_SPEED, inches, inches, 1000);
     }
 
     private double radiansToCounts(double r) {
         return (COUNTS_PER_MOTOR_REV / (2 * Math.PI)) * r;
     }
 
-    /*
     public void encoderArm(double upperJointRadians, double lowerJointRadians, double speed,
                            double timeoutS) {
         if (opModeIsActive()) {
@@ -201,7 +193,6 @@ public class RobotAuto extends LinearOpMode {
             sleep(250);   // optional pause after each move.
         }
     }
-     */
 
     /*
      *  Method to perform a relative move, based on encoder counts.
@@ -219,7 +210,6 @@ public class RobotAuto extends LinearOpMode {
         int newRearLeftTarget;
         int newRearRightTarget;
 
-        telemetry.addLine("running encoder drive");
         // Ensure that the OpMode is still active
         if (opModeIsActive()) {
 
@@ -258,9 +248,9 @@ public class RobotAuto extends LinearOpMode {
                    (frontLeft.isBusy() && frontRight.isBusy() && rearRight.isBusy() && rearLeft.isBusy())) {
 
                 // Display it for the driver.
-                telemetry.addData("Running to",  " %7d :%7d", frontLeft.getTargetPosition(),  newFrontLeftTarget);
+                telemetry.addData("Running to",  " %7d :%7d", newFrontLeftTarget,  newFrontLeftTarget);
                 telemetry.addData("Currently at",  " at %7d :%7d",
-                                            frontLeft.getCurrentPosition(), frontRight.getCurrentPosition(), rearRight.getCurrentPosition(), rearLeft.getCurrentPosition());
+                                            frontLeft.getCurrentPosition(), frontRight.getCurrentPosition());
                 telemetry.update();
             }
 
