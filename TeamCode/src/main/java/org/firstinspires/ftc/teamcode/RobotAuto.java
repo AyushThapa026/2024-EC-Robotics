@@ -161,7 +161,7 @@ public class RobotAuto extends LinearOpMode {
 
         sleep(1000);  // pause to display final telemetry message.
 
-        visionPortal.resumeStreaming();
+        visionPortal.resumeStreaming(); // stop?
     }
 
 
