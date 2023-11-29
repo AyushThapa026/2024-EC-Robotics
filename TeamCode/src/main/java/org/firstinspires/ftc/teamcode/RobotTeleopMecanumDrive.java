@@ -38,12 +38,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-
-import java.util.List;
-
 /*
  * This OpMode executes a Tank Drive control TeleOp a direct drive robot
  * The code is structured as an Iterative OpMode
@@ -79,9 +73,6 @@ public class RobotTeleopMecanumDrive extends OpMode{
     //public Servo launcherServo = null;
 
     private ElapsedTime runtime = new ElapsedTime();
-
-    private AprilTagProcessor aprilTag;
-    private VisionPortal visionPortal;
 
 
     /*
@@ -161,16 +152,6 @@ public class RobotTeleopMecanumDrive extends OpMode{
         telemetry.addData("rightFront",  "%.2f", rightFrontWheelPower);
         telemetry.addData("leftRear",  "%.2f", leftRearWheelPower);
         telemetry.addData("rightRear", "%.2f", rightRearWheelPower);
-    }
-
-    public void aprilTagLoop(){
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        telemetry.addData("# AprilTags Detected", currentDetections.size());
-
-        // Step through the list of detections and display info for each one.
-        for (AprilTagDetection detection : currentDetections) {
-            //TODO: Make the april tags work
-        }
     }
 
     public void armMovementLoop() {
