@@ -79,10 +79,6 @@ public class RobotTeleopMecanumDrive extends OpMode{
 
     //public Servo launcherServo = null;
 
-    private TfodProcessor tfod;
-
-    private VisionPortal visionPortal;
-
     private ElapsedTime runtime = new ElapsedTime();
 
 
@@ -120,9 +116,6 @@ public class RobotTeleopMecanumDrive extends OpMode{
         frontRight.setDirection(DcMotor.Direction.FORWARD);
         rearLeft.setDirection(DcMotor.Direction.REVERSE);
         rearRight.setDirection(DcMotor.Direction.FORWARD);
-
-        //Tensorflow
-        visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam"), tfod);
 
         // If there are encoders connected, switch to RUN_USING_ENCODER mode for greater accuracy
         // leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -212,30 +205,6 @@ public class RobotTeleopMecanumDrive extends OpMode{
      }
      */
 
-    public void TFodLoop(){
-        List<Recognition> currentRecognitions = tfod.getRecognitions();
-        telemetry.addData("# Objects Detected", currentRecognitions.size());
-
-        // Step through the list of recognitions and display info for each one.
-        for (Recognition recognition : currentRecognitions) {
-            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
-            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
-
-            telemetry.addData(""," ");
-            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
-            telemetry.addData("- Position", "%.0f / %.0f", x, y);
-            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
-
-            /*
-            if(recognition.getConfidence() > 0.7 && recognition.getLabel() == "Pixel"){
-                //pickup/drop object
-            } else if (recognition.getConfidence() > 0.7 && recognition.getLabel() == "Object") {
-                //pickup/drop object
-            }
-             */
-        }
-    }
-
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
@@ -245,7 +214,6 @@ public class RobotTeleopMecanumDrive extends OpMode{
         wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
         armMovementLoop(); // Control the movement of the arm claw using gamepad2
         //launcherLoop();
-        TFodLoop();
 
         // Using the run time to display the amount of time remaining in the game mode
         if(runtime.seconds() < 120)
