@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
@@ -214,8 +215,8 @@ public class RobotAuto extends LinearOpMode {
     }
 
 
-    // Returns true or false based on if the white pixel is detected
-    public boolean pixelDetected(){
+    // Returns the pixel recognition if the white pixel is detected, otherwise returns a recognition with label "null"
+    public Recognition pixelDetected(){
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());
 
@@ -231,10 +232,65 @@ public class RobotAuto extends LinearOpMode {
 
 
             if(recognition.getConfidence() > 0.7 && recognition.getLabel().equals("Pixel")) {
-                return true;
+                return recognition;
             }
         }
-        return false;
+        return new Recognition() {
+            @Override
+            public String getLabel() {
+                return null;
+            }
+
+            @Override
+            public float getConfidence() {
+                return 0;
+            }
+
+            @Override
+            public float getLeft() {
+                return 0;
+            }
+
+            @Override
+            public float getRight() {
+                return 0;
+            }
+
+            @Override
+            public float getTop() {
+                return 0;
+            }
+
+            @Override
+            public float getBottom() {
+                return 0;
+            }
+
+            @Override
+            public float getWidth() {
+                return 0;
+            }
+
+            @Override
+            public float getHeight() {
+                return 0;
+            }
+
+            @Override
+            public int getImageWidth() {
+                return 0;
+            }
+
+            @Override
+            public int getImageHeight() {
+                return 0;
+            }
+
+            @Override
+            public double estimateAngleToObject(AngleUnit angleUnit) {
+                return 0;
+            }
+        };
     }
 
     /*
