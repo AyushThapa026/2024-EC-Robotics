@@ -144,24 +144,29 @@ public class RobotAuto extends LinearOpMode {
                           rearRight.getCurrentPosition());
         telemetry.update();
 
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
 
         tfod = TfodProcessor.easyCreateWithDefaults();
         visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam"), tfod);
 
+        visionPortal.resumeStreaming(); // stop?
+
+        while (opModeIsActive()) {
+            pixelDetected();
+        }
+
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED,  48,  48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-        encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-        encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+        //encoderDrive(DRIVE_SPEED,  48,  48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+        //encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+        //encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
 
         sleep(1000);  // pause to display final telemetry message.
-
-        visionPortal.resumeStreaming(); // stop?
     }
 
 
