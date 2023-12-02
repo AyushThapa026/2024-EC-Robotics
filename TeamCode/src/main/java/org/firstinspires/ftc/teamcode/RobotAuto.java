@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /*
@@ -60,7 +61,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Robot: Auto", group="Robot")
+@Autonomous(name="Auto", group="Robot")
 public class RobotAuto extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -74,6 +75,8 @@ public class RobotAuto extends LinearOpMode {
     public DcMotor upperArmJoint = null;
     public DcMotor lowerArmJoint = null;
     public DcMotor rootArmJoint = null;
+    public Servo clawPush = null;
+    public Servo clawDrop = null;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -121,7 +124,11 @@ public class RobotAuto extends LinearOpMode {
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+<<<<<<< Updated upstream
         upperArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+=======
+        //upperArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+>>>>>>> Stashed changes
         //lowerArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to indicate successful Encoder reset
@@ -140,6 +147,7 @@ public class RobotAuto extends LinearOpMode {
         //encoderDrive(DRIVE_SPEED,  48,  48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
         //encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
         //encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+<<<<<<< Updated upstream
         sleep(500);
         move(30);
         //sleep(100);
@@ -147,16 +155,25 @@ public class RobotAuto extends LinearOpMode {
         //sleep(100);
         move(30);
 
+=======
+
+        timeDrive(0.05, 12);
+        sleep(5000);
+        timeDrive(0.05, -12);
+>>>>>>> Stashed changes
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
         sleep(1000);  // pause to display final telemetry message.
     }
 
+<<<<<<< Updated upstream
     public void turn(double radians){
         encoderDrive(TURN_SPEED, -(radians * 20.043971751969), (radians * 20.043971751969), 1000);
     }
 
+=======
+>>>>>>> Stashed changes
     public void move(double inches){
         encoderDrive(DRIVE_SPEED, inches, inches, 30);
     }
@@ -211,6 +228,31 @@ public class RobotAuto extends LinearOpMode {
      *  2) Move runs out of time
      *  3) Driver stops the OpMode running.
      */
+    public void pushPixel(){
+
+    }
+
+    public void dropPixel(){
+
+    }
+    public void timeDrive(double speed, double inches){
+        double time = 5.14*inches/(12*speed);
+        if(inches < 0)
+            speed*=-1;
+        frontLeft.setPower(speed);
+        frontRight.setPower(speed);
+        rearRight.setPower(speed);
+        rearLeft.setPower(speed);
+        runtime.reset();
+        while (opModeIsActive() && runtime.seconds() < time){
+            telemetry.addData("time calculated:", time);
+            telemetry.update();
+        }
+        frontRight.setPower(0);
+        frontLeft.setPower(0);
+        rearLeft.setPower(0);
+        rearRight.setPower(0);
+    }
     public void encoderDrive(double speed,
                              double leftInches, double rightInches,
                              double timeoutS) {
@@ -279,4 +321,58 @@ public class RobotAuto extends LinearOpMode {
             sleep(250);   // optional pause after each move.
         }
     }
+<<<<<<< Updated upstream
 }
+=======
+
+    //TODO: Test the turn and move functions
+    public void turn(double radians){
+        encoderDrive(TURN_SPEED, -(radians * Math.sqrt(550)) / 2.54, (radians * Math.sqrt(550)) / 2.54, 1000);
+    }
+
+    public boolean objectInFront(){
+        return false;
+        //TODO: Finish this
+    }
+
+/*    public void placeObject(){
+        //TODO: Finish this
+    }
+
+    public void moveServo(){
+        //TODO: Finish this
+    }
+*/
+    public void auto(){
+        int pos;
+        move(18);
+        if (objectInFront()){
+            pos = 1;
+            pushPixel();
+            turn(-Math.PI/2);
+            move(23);
+        } else {
+            turn(-Math.PI/2);
+            move(22);
+            turn(Math.PI/2);
+            if(objectInFront()){
+                pos = 2;
+                pushPixel();
+                turn(-Math.PI/2);
+            } else {
+                move(13);
+                turn(Math.PI/2);
+                move(6);
+                pos = 3;
+                pushPixel();
+                turn(-Math.PI/2);
+                move(-13);
+                turn(-Math.PI/2);
+                move(6);
+            }
+
+        }
+
+    }
+}
+>>>>>>> Stashed changes
