@@ -94,10 +94,15 @@ public class RobotTeleopMecanumDrive extends OpMode{
         leftLinearSlide = hardwareMap.get(DcMotor.class, "left_linear_slide");
         rightLinearSlide = hardwareMap.get(DcMotor.class, "right_linear_slide");
 
+<<<<<<< Updated upstream
         upperArmJoint = hardwareMap.dcMotor.get("arm_upper_joint");
         lowerArmJoint = hardwareMap.dcMotor.get("arm_lower_joint");
         clawRotation = hardwareMap.servo.get("claw_rotation");
         claw = hardwareMap.servo.get("claw_controller");
+=======
+        //upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
+        //lowerArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
+>>>>>>> Stashed changes
         //rootArmJoint = hardwareMap.get(DcMotor.class, "root_arm_joint");
         */
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
@@ -106,9 +111,9 @@ public class RobotTeleopMecanumDrive extends OpMode{
 
         //this needs to be corrected with testing, this is just and example
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
-        frontRight.setDirection(DcMotor.Direction.REVERSE);
-        rearLeft.setDirection(DcMotor.Direction.FORWARD);
-        rearRight.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        rearLeft.setDirection(DcMotor.Direction.REVERSE);
+        rearRight.setDirection(DcMotor.Direction.FORWARD);
         /*
         leftLinearSlide.setDirection(DcMotorSimple.Direction.REVERSE);
         rightLinearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -138,7 +143,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public void wheelMovementLoop() {
         // Using trig to set the motor speeds so that the bot can move in all directions
         double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
-        double robotAngle = Math.atan2(-gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
+        double robotAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
         double rightX = gamepad1.right_stick_x;
 
         double leftFrontWheelPower = r * Math.cos(robotAngle) * Math.sqrt(2) + rightX;
@@ -157,6 +162,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
         telemetry.addData("rightRear", "%.2f", rightRearWheelPower);
     }
 
+    /*
     public void armMovementLoop() {
         double upperArmJointPower = gamepad2.left_stick_y;
         double lowerArmJointPower = gamepad2.right_stick_y;
@@ -168,6 +174,8 @@ public class RobotTeleopMecanumDrive extends OpMode{
         lowerArmJoint.setPower(lowerArmJointPower * jointSpeedDamp);
 
         if(gamepad1.dpad_up) {
+        if(gamepad2.dpad_up) {
+>>>>>>> Stashed changes
             leftLinearSlide.setPower(linearSpeedPower);
             rightLinearSlide.setPower(linearSpeedPower);
         } else if(gamepad1.dpad_down){
@@ -177,6 +185,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
             leftLinearSlide.setPower(0);
             rightLinearSlide.setPower(0);
         }
+<<<<<<< Updated upstream
 
 
 
@@ -198,7 +207,8 @@ public class RobotTeleopMecanumDrive extends OpMode{
         else if (gamepad2.y)
             claw.setPosition(0.0);
         telemetry.addData("claw controller:", claw.getPosition());
-    }
+=======
+        */
 
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
