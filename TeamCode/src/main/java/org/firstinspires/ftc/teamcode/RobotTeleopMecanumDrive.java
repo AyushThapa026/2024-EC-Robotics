@@ -62,17 +62,23 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public DcMotor  frontRight  = null;
     public DcMotor  rearLeft    = null;
     public DcMotor  rearRight   = null;
-    public DcMotor leftLinearSlide = null;
-    public DcMotor rightLinearSlide = null;
-
     public Servo clawRotation = null;
 
+    public DcMotor suspensionMotor = null;
     public Servo claw = null;
-    public DcMotor upperArmJoint = null;
-    public DcMotor lowerArmJoint = null;
-    public DcMotor rootArmJoint = null;
+
+    public Servo airplaneServo = null;
 
     private ElapsedTime runtime = new ElapsedTime();
+    static final double     COUNTS_PER_MOTOR_REV    = 537.7;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 1.0;     // No External Gearing.
+    static final double     WHEEL_DIAMETER_INCHES   = 3.77953;     // For figuring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
+
+    public double driveSpeed = 0.5;
+
+    public boolean isSuspended = false;
 
 
     /*
@@ -89,38 +95,20 @@ public class RobotTeleopMecanumDrive extends OpMode{
         frontRight = hardwareMap.dcMotor.get("right_front_drive");
         rearLeft = hardwareMap.dcMotor.get("left_rear_drive");
         rearRight = hardwareMap.dcMotor.get("right_rear_drive");
-        /*
-        //arm
-        leftLinearSlide = hardwareMap.get(DcMotor.class, "left_linear_slide");
-        rightLinearSlide = hardwareMap.get(DcMotor.class, "right_linear_slide");
 
-<<<<<<< Updated upstream
-        upperArmJoint = hardwareMap.dcMotor.get("arm_upper_joint");
-        lowerArmJoint = hardwareMap.dcMotor.get("arm_lower_joint");
-        clawRotation = hardwareMap.servo.get("claw_rotation");
-        claw = hardwareMap.servo.get("claw_controller");
-=======
-        //upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
-        //lowerArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
->>>>>>> Stashed changes
-        //rootArmJoint = hardwareMap.get(DcMotor.class, "root_arm_joint");
-        */
-        // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
-        // Pushing the left and right sticks forward MUST make robot go forward. So adjust these two lines based on your first test drive.
-        // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
+        airplaneServo = hardwareMap.servo.get("airplane_servo");
+        suspensionMotor = hardwareMap.dcMotor.get("suspension_motor");
 
         //this needs to be corrected with testing, this is just and example
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
         rearLeft.setDirection(DcMotor.Direction.REVERSE);
         rearRight.setDirection(DcMotor.Direction.FORWARD);
-        /*
-        leftLinearSlide.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightLinearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
-        */
-        // If there are encoders connected, switch to RUN_USING_ENCODER mode for greater accuracy
-        // leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        // rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        suspensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        suspensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        suspensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData(">", "Robot Ready.  Press Play.");    //
@@ -129,9 +117,13 @@ public class RobotTeleopMecanumDrive extends OpMode{
     /*
      * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
      */
+
+    private int issueLevel = 0;
     @Override
     public void init_loop() {
-
+        telemetry.addData("Issue level: ", issueLevel);
+        telemetry.update();
+        issueLevel++;
     }
 
     /*
@@ -139,6 +131,22 @@ public class RobotTeleopMecanumDrive extends OpMode{
      */
     @Override
     public void start() {}
+
+    public void servoMovementLoop() {
+        if (gamepad1.x) {
+            airplaneServo.setPosition(1);
+            telemetry.addData("x DOWN", "");
+        }
+        telemetry.update();
+    }
+
+    public void sprintInput() {
+        if (gamepad1.left_bumper) {
+            driveSpeed = 1;
+        } else {
+            driveSpeed = 0.5;
+        }
+    }
 
     public void wheelMovementLoop() {
         // Using trig to set the motor speeds so that the bot can move in all directions
@@ -151,10 +159,10 @@ public class RobotTeleopMecanumDrive extends OpMode{
         double leftRearWheelPower = r * Math.sin(robotAngle) * Math.sqrt(2) + rightX;
         double rightRearWheelPower = r * Math.cos(robotAngle) * Math.sqrt(2) - rightX;
 
-        frontLeft.setPower(leftFrontWheelPower);
-        frontRight.setPower(rightFrontWheelPower);
-        rearLeft.setPower(leftRearWheelPower);
-        rearRight.setPower(rightRearWheelPower);
+        frontLeft.setPower(leftFrontWheelPower * driveSpeed);
+        frontRight.setPower(rightFrontWheelPower * driveSpeed);
+        rearLeft.setPower(leftRearWheelPower * driveSpeed);
+        rearRight.setPower(rightRearWheelPower * driveSpeed);
 
         telemetry.addData("leftFront",  "%.2f", leftFrontWheelPower);
         telemetry.addData("rightFront",  "%.2f", rightFrontWheelPower);
@@ -162,68 +170,42 @@ public class RobotTeleopMecanumDrive extends OpMode{
         telemetry.addData("rightRear", "%.2f", rightRearWheelPower);
     }
 
-    /*
-    public void armMovementLoop() {
-        double upperArmJointPower = gamepad2.left_stick_y;
-        double lowerArmJointPower = gamepad2.right_stick_y;
+    public void suspensionLoop() {
+        if (!isSuspended) {
+            if (gamepad1.y) {
+                // Turn On RUN_TO_POSITION
+                isSuspended = true;
+                while (true) {
+                    suspensionMotor.setPower(-1);
+                }
+            /*
+            long setTime = System.currentTimeMillis();
+            while (true) {
+                if (System.currentTimeMillis() - setTime > 500)  {
+                    setTime = System.currentTimeMillis();
 
-        double jointSpeedDamp = 0.3;
-        double linearSpeedPower = 0.3;
-
-        upperArmJoint.setPower(upperArmJointPower * jointSpeedDamp);
-        lowerArmJoint.setPower(lowerArmJointPower * jointSpeedDamp);
-
-        if(gamepad1.dpad_up) {
-        if(gamepad2.dpad_up) {
->>>>>>> Stashed changes
-            leftLinearSlide.setPower(linearSpeedPower);
-            rightLinearSlide.setPower(linearSpeedPower);
-        } else if(gamepad1.dpad_down){
-            leftLinearSlide.setPower(-linearSpeedPower);
-            rightLinearSlide.setPower(-linearSpeedPower);
-        } else if(gamepad1.dpad_left){
-            leftLinearSlide.setPower(0);
-            rightLinearSlide.setPower(0);
+                }
+            }
+            */
+            } else if (gamepad1.dpad_up) {
+                suspensionMotor.setPower(0.8);
+            } else if (gamepad1.dpad_down) {
+                suspensionMotor.setPower(-0.8);
+            } else {
+                suspensionMotor.setPower(0);
+            }
         }
-<<<<<<< Updated upstream
 
-
-
-        if(gamepad2.dpad_up)
-            clawRotation.setPosition(clawRotation.getPosition()+0.0002);
-        else if(gamepad2.dpad_down)
-            clawRotation.setPosition(clawRotation.getPosition()-0.0002);
-        else if (gamepad2.dpad_left) {
-            clawRotation.setPosition(clawRotation.getPosition());
-        }
-        telemetry.addData("claw rotation:", clawRotation.getPosition());
-
-        if(gamepad2.a)
-            claw.setPosition(1.0);
-        else if (gamepad2.b)
-            claw.setPosition(1/6.0);
-        else if (gamepad2.x)
-            claw.setPosition(5/6.0);
-        else if (gamepad2.y)
-            claw.setPosition(0.0);
-        telemetry.addData("claw controller:", claw.getPosition());
-=======
-        */
-
+    }
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
     @Override
     public void loop() {
-
         wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
-        //armMovementLoop(); // Control the movement of the arm claw using gamepad2
-
-        // Using the run time to display the amount of time remaining in the game mode
-        if(runtime.seconds() < 120)
-            telemetry.addData("Time Left in Normal Mode", "%4.1f S", (120 - runtime.seconds()));
-        else
-            telemetry.addData("Time Left in Endgame", "%4.1f S", (150 - runtime.seconds()));
+        servoMovementLoop();
+        suspensionLoop();
+        sprintInput();
     }
 
     /*

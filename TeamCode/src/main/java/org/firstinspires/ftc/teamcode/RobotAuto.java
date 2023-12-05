@@ -116,6 +116,7 @@ public class RobotAuto extends LinearOpMode {
         rearRight = hardwareMap.dcMotor.get("right_rear_drive");
         //upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
         //lowerArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
+        clawPush = hardwareMap.servo.get("pixel_push");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -129,19 +130,12 @@ public class RobotAuto extends LinearOpMode {
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //upperArmJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //lowerArmJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //upperArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //lowerArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         tfod = TfodProcessor.easyCreateWithDefaults();
         visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), tfod);
-        visionPortal.stopLiveView();
+        visionPortal.setProcessorEnabled(tfod, false);
+        visionPortal.stopLiveView(); // Save CPU resources
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Starting at",  "%7d :%7d",
@@ -153,25 +147,6 @@ public class RobotAuto extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-
-        // Step through each leg of the path,
-        // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        //encoderDrive(DRIVE_SPEED,  48,  48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-        //encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-        //encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
-        //sleep(500);
-        //move(30);
-        /*
-        turn(Math.PI/2);
-
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
-        sleep(1000);  // pause to display final telemetry message.
-        while(opModeIsActive()){
-            telemetry.addData("pixelInFront: ", Boolean.toString(objectInFront()));
-            telemetry.update();
-        }
-         */
 
         auto();
     }
@@ -188,44 +163,6 @@ public class RobotAuto extends LinearOpMode {
     }
 
     /*
-    public void encoderArm(double upperJointRadians, double lowerJointRadians, double speed,
-                           double timeoutS) {
-        if (opModeIsActive()) {
-            int upperJointCounts = (int) radiansToCounts(upperJointRadians);
-            int lowerJointCounts = (int) radiansToCounts(lowerJointRadians);
-
-            int targetUpperArmPosition = upperArmJoint.getCurrentPosition() + upperJointCounts;
-            int targetLowerArmPosition = lowerArmJoint.getCurrentPosition() + lowerJointCounts;
-            upperArmJoint.setTargetPosition(targetUpperArmPosition);
-            lowerArmJoint.setTargetPosition(targetLowerArmPosition);
-
-            upperArmJoint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            lowerArmJoint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            runtime.reset();
-            upperArmJoint.setPower(Math.abs(speed));
-            lowerArmJoint.setPower(Math.abs(speed));
-
-            while (opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
-                    (frontLeft.isBusy() && frontRight.isBusy() && rearRight.isBusy() && rearLeft.isBusy())) {
-
-                // Display it for the driver.
-                telemetry.addData("Running to",  " %7d :%7d", upperJointCounts,  lowerJointCounts);
-                telemetry.addData("Currently at",  " at %7d :%7d",
-                        frontLeft.getCurrentPosition(), frontRight.getCurrentPosition());
-                telemetry.update();
-            }
-
-            upperArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            lowerArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            sleep(250);   // optional pause after each move.
-        }
-    }
-     */
-
-    /*
      *  Method to perform a relative move, based on encoder counts.
      *  Encoders are not reset as the move is based on the current position.
      *  Move will stop if any of three conditions occur:
@@ -234,7 +171,9 @@ public class RobotAuto extends LinearOpMode {
      *  3) Driver stops the OpMode running.
      */
     public void pushPixel(){
-
+        move(4);
+        clawPush.setPosition(0); // TODO: Find the actual position
+        move(-4);
     }
 
     public void dropPixel(){
@@ -290,10 +229,6 @@ public class RobotAuto extends LinearOpMode {
                 // Display it for the driver.
                 telemetry.addData("Running to",  " %7d :%7d", frontLeft.getTargetPosition(),  newFrontLeftTarget);
                 //telemetry.addData("Runtime: ", runtime.seconds());
-                telemetry.addData("front left power: ", frontLeft.getPower());
-                telemetry.addData("front right power: ", frontRight.getPower());
-                telemetry.addData("rear left power: ", rearLeft.getPower());
-                telemetry.addData("rear right power: ", rearRight.getPower());
 
                 telemetry.addData("Currently at",  " at %7d :%7d",
                                             frontLeft.getCurrentPosition(), frontRight.getCurrentPosition(), rearRight.getCurrentPosition(), rearLeft.getCurrentPosition());
@@ -318,6 +253,7 @@ public class RobotAuto extends LinearOpMode {
 
     public boolean objectInFront(){
         //visionPortal.resumeStreaming();
+        visionPortal.setProcessorEnabled(tfod, true);
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());
 
@@ -334,25 +270,19 @@ public class RobotAuto extends LinearOpMode {
 
             if(recognition.getConfidence() > 0.7 && recognition.getLabel().equals("Pixel")) {
                 //visionPortal.stopStreaming();
+                visionPortal.setProcessorEnabled(tfod, false);
                 return true;
             }
         }
 
+        visionPortal.setProcessorEnabled(tfod, false);
         //visionPortal.stopStreaming();
         return false;
     }
 
-
-    /*    public void placeObject(){
-        //TODO: Finish this
-    }
-
-    public void moveServo(){
-        //TODO: Finish this
-    }
-*/
     public void auto(){
         int pos;
+        /*
         move(18);
         if (objectInFront()){
             pos = 1;
@@ -380,6 +310,43 @@ public class RobotAuto extends LinearOpMode {
             }
 
         }
-
+         */
+        move(6);
+        turn(-Math.PI/2); // right
+        move(18);
+        turn(Math.PI/2); // left
+        move(30);
+        telemetry.addData("Pixel detected:", objectInFront());
+        telemetry.update();
+        /*
+        if(objectInFront()){
+            pushPixel();
+            move(-24);
+            turn(-Math.PI/2);
+            move(46);
+        } else {
+            move(12+9);
+            turn(Math.PI/2);
+            move(5);
+            if(objectInFront()){
+                pushPixel();
+                move(-5);
+                turn(Math.PI/2);
+                move(42);
+                turn(Math.PI/2);
+                move(42);
+            }else {
+                turn(Math.PI/2);
+                move(6);
+                turn(-Math.PI/2);
+                move(13);
+                pushPixel();
+                turn(Math.PI/2);
+                move(36);
+                turn(Math.PI/2);
+                move(48);
+            }
+        }
+         */
     }
 }
