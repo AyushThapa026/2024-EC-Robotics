@@ -1,3 +1,8 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
 /* Copyright (c) 2017 FIRST. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -27,21 +32,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
-
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.tfod.TfodProcessor;
-import java.util.*;
-
-
-
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
  * The code is structured as a LinearOpMode
@@ -68,6 +58,20 @@ import java.util.*;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.tfod.TfodProcessor;
+import java.util.*;
 @Autonomous(name="Auto", group="Robot")
 public class RobotAuto extends LinearOpMode {
 
@@ -106,61 +110,71 @@ public class RobotAuto extends LinearOpMode {
     static final double     DRIVE_SPEED             = 0.3;
     static final double     TURN_SPEED              = 0.3;
 
+    BNO055IMU imu;
+
+    Orientation angles;
+
     @Override
     public void runOpMode() {
 
-        // Initialize the drive system variables.
-        frontLeft  = hardwareMap.dcMotor.get("left_front_drive");
-        frontRight = hardwareMap.dcMotor.get("right_front_drive");
-        rearLeft = hardwareMap.dcMotor.get("left_rear_drive");
-        rearRight = hardwareMap.dcMotor.get("right_rear_drive");
-        //upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
-        //lowerArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
 
-        // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
-        // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
-        // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        frontLeft.setDirection(DcMotor.Direction.FORWARD);
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        rearLeft.setDirection(DcMotor.Direction.REVERSE);
-        rearRight.setDirection(DcMotor.Direction.FORWARD);
+            imu = hardwareMap.get(BNO055IMU.class, "ROBOT");
+            imu.initialize(parameters);
 
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //upperArmJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //lowerArmJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            // Initialize the drive system variables.
+            frontLeft  = hardwareMap.dcMotor.get("left_front_drive");
+            frontRight = hardwareMap.dcMotor.get("right_front_drive");
+            rearLeft = hardwareMap.dcMotor.get("left_rear_drive");
+            rearRight = hardwareMap.dcMotor.get("right_rear_drive");
+            //upperArmJoint = hardwareMap.get(DcMotor.class, "arm_upper_joint");
+            //lowerArmJoint = hardwareMap.get(DcMotor.class, "arm_lower_joint");
 
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //upperArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //lowerArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
+            // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
+            // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
+            frontLeft.setDirection(DcMotor.Direction.FORWARD);
+            frontRight.setDirection(DcMotor.Direction.FORWARD);
+            rearLeft.setDirection(DcMotor.Direction.REVERSE);
+            rearRight.setDirection(DcMotor.Direction.FORWARD);
 
-        tfod = TfodProcessor.easyCreateWithDefaults();
-        visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), tfod);
-        visionPortal.stopLiveView();
+            frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            //upperArmJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            //lowerArmJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Starting at",  "%7d :%7d",
-                frontLeft.getCurrentPosition(),
-                frontRight.getCurrentPosition(),
-                rearLeft.getCurrentPosition(),
-                rearRight.getCurrentPosition());
-        telemetry.update();
+            frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //upperArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //lowerArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
+            tfod = TfodProcessor.easyCreateWithDefaults();
+            visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), tfod);
+            visionPortal.stopLiveView();
 
-        // Step through each leg of the path,
-        // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        //encoderDrive(DRIVE_SPEED,  48,  48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-        //encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-        //encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
-        //sleep(500);
-        //move(30);
+            // Send telemetry message to indicate successful Encoder reset
+            telemetry.addData("Starting at",  "%7d :%7d",
+            frontLeft.getCurrentPosition(),
+            frontRight.getCurrentPosition(),
+            rearLeft.getCurrentPosition(),
+            rearRight.getCurrentPosition());
+            telemetry.update();
+
+            // Wait for the game to start (driver presses PLAY)
+            waitForStart();
+
+            // Step through each leg of the path,
+            // Note: Reverse movement is obtained by setting a negative distance (not speed)
+            //encoderDrive(DRIVE_SPEED,  48,  48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+            //encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+            //encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+            //sleep(500);
+            //move(30);
         /*
         turn(Math.PI/2);
 
@@ -173,19 +187,111 @@ public class RobotAuto extends LinearOpMode {
         }
          */
 
-        auto();
-    }
+            auto();
+            }
     public void turn(double radians){
-        encoderDrive(TURN_SPEED, -(radians * 20.043971751969), (radians * 20.043971751969), 1000);
-    }
+            encoderDrive(TURN_SPEED, -(radians * 20.043971751969), (radians * 20.043971751969), 1000);
+            }
+
+    public void turnRight(){
+            turn(Math.PI/2);
+            }
+
+    public void turnLeft(){
+            turn(-Math.PI/2);
+            }
 
     public void move(double inches){
-        encoderDrive(DRIVE_SPEED, inches, inches, 30);
-    }
+            encoderDrive(DRIVE_SPEED, inches, inches, 30);
+            }
 
     private double radiansToCounts(double r) {
-        return (COUNTS_PER_MOTOR_REV / (2 * Math.PI)) * r;
-    }
+            return (COUNTS_PER_MOTOR_REV / (2 * Math.PI)) * r;
+            }
+
+    public void updateAngles(){
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            //angles.firstAngle is the heading angle
+            }
+    public void encoderStrafe(double speed,
+            double inches, // negative is left, positive is right
+            double timeoutS) {
+            int newFrontLeftTarget;
+            int newFrontRightTarget;
+            int newRearLeftTarget;
+            int newRearRightTarget;
+
+            // Ensure that the OpMode is still active
+            if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newFrontLeftTarget = frontLeft.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
+            newFrontRightTarget = frontRight.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
+            newRearLeftTarget = rearLeft.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
+            newRearRightTarget = rearRight.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
+
+            frontLeft.setTargetPosition(newFrontLeftTarget);
+            frontRight.setTargetPosition(newFrontRightTarget);
+            rearLeft.setTargetPosition(newRearLeftTarget);
+            rearRight.setTargetPosition(newRearRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rearLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rearRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            frontLeft.setPower(Math.abs(speed));
+            frontRight.setPower(Math.abs(speed));
+            rearLeft.setPower(Math.abs(speed));
+            rearRight.setPower(Math.abs(speed));
+
+            //sleep(10000);
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+            (runtime.seconds() < timeoutS) &&
+            (frontLeft.isBusy() && frontRight.isBusy() && rearRight.isBusy() && rearLeft.isBusy())) {
+
+            // Display it for the driver.
+            telemetry.addData("Running to",  " %7d :%7d", frontLeft.getTargetPosition(),  newFrontLeftTarget);
+            //telemetry.addData("Runtime: ", runtime.seconds());
+            telemetry.addData("front left power: ", frontLeft.getPower());
+            telemetry.addData("front right power: ", frontRight.getPower());
+            telemetry.addData("rear left power: ", rearLeft.getPower());
+            telemetry.addData("rear right power: ", rearRight.getPower());
+
+            telemetry.addData("Currently at",  " at %7d :%7d",
+            frontLeft.getCurrentPosition(), frontRight.getCurrentPosition(), rearRight.getCurrentPosition(), rearLeft.getCurrentPosition());
+            telemetry.update();
+            }
+
+            // Stop all motion;
+            frontRight.setPower(0);
+            frontLeft.setPower(0);
+            rearRight.setPower(0);
+            rearLeft.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            sleep(250);   // optional pause after each move.
+            }
+            }
+
+    public void strafe(int inches){
+            encoderStrafe(0.3, inches, 1000);
+            }
 
     /*
     public void encoderArm(double upperJointRadians, double lowerJointRadians, double speed,
@@ -235,21 +341,21 @@ public class RobotAuto extends LinearOpMode {
      */
     public void pushPixel(){
 
-    }
+            }
 
     public void dropPixel(){
 
-    }
+            }
     public void encoderDrive(double speed,
-                             double leftInches, double rightInches,
-                             double timeoutS) {
-        int newFrontLeftTarget;
-        int newFrontRightTarget;
-        int newRearLeftTarget;
-        int newRearRightTarget;
+            double leftInches, double rightInches,
+            double timeoutS) {
+            int newFrontLeftTarget;
+            int newFrontRightTarget;
+            int newRearLeftTarget;
+            int newRearRightTarget;
 
-        // Ensure that the OpMode is still active
-        if (opModeIsActive()) {
+            // Ensure that the OpMode is still active
+            if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
             newFrontLeftTarget = frontLeft.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
@@ -284,20 +390,20 @@ public class RobotAuto extends LinearOpMode {
             // However, if you require that BOTH motors have finished their moves before the robot continues
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             while (opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
-                    (frontLeft.isBusy() && frontRight.isBusy() && rearRight.isBusy() && rearLeft.isBusy())) {
+            (runtime.seconds() < timeoutS) &&
+            (frontLeft.isBusy() && frontRight.isBusy() && rearRight.isBusy() && rearLeft.isBusy())) {
 
-                // Display it for the driver.
-                telemetry.addData("Running to",  " %7d :%7d", frontLeft.getTargetPosition(),  newFrontLeftTarget);
-                //telemetry.addData("Runtime: ", runtime.seconds());
-                telemetry.addData("front left power: ", frontLeft.getPower());
-                telemetry.addData("front right power: ", frontRight.getPower());
-                telemetry.addData("rear left power: ", rearLeft.getPower());
-                telemetry.addData("rear right power: ", rearRight.getPower());
+            // Display it for the driver.
+            telemetry.addData("Running to",  " %7d :%7d", frontLeft.getTargetPosition(),  newFrontLeftTarget);
+            //telemetry.addData("Runtime: ", runtime.seconds());
+            telemetry.addData("front left power: ", frontLeft.getPower());
+            telemetry.addData("front right power: ", frontRight.getPower());
+            telemetry.addData("rear left power: ", rearLeft.getPower());
+            telemetry.addData("rear right power: ", rearRight.getPower());
 
-                telemetry.addData("Currently at",  " at %7d :%7d",
-                        frontLeft.getCurrentPosition(), frontRight.getCurrentPosition(), rearRight.getCurrentPosition(), rearLeft.getCurrentPosition());
-                telemetry.update();
+            telemetry.addData("Currently at",  " at %7d :%7d",
+            frontLeft.getCurrentPosition(), frontRight.getCurrentPosition(), rearRight.getCurrentPosition(), rearLeft.getCurrentPosition());
+            telemetry.update();
             }
 
             // Stop all motion;
@@ -313,16 +419,16 @@ public class RobotAuto extends LinearOpMode {
             rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             sleep(250);   // optional pause after each move.
-        }
-    }
+            }
+            }
 
     public boolean objectInFront(){
-        //visionPortal.resumeStreaming();
-        List<Recognition> currentRecognitions = tfod.getRecognitions();
-        telemetry.addData("# Objects Detected", currentRecognitions.size());
+            //visionPortal.resumeStreaming();
+            List<Recognition> currentRecognitions = tfod.getRecognitions();
+            telemetry.addData("# Objects Detected", currentRecognitions.size());
 
-        // Step through the list of recognitions and display info for each one.
-        for (Recognition recognition : currentRecognitions) {
+            // Step through the list of recognitions and display info for each one.
+            for (Recognition recognition : currentRecognitions) {
             double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
             double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
 
@@ -333,14 +439,14 @@ public class RobotAuto extends LinearOpMode {
 
 
             if(recognition.getConfidence() > 0.7 && recognition.getLabel().equals("Pixel")) {
-                //visionPortal.stopStreaming();
-                return true;
+            //visionPortal.stopStreaming();
+            return true;
             }
-        }
+            }
 
-        //visionPortal.stopStreaming();
-        return false;
-    }
+            //visionPortal.stopStreaming();
+            return false;
+            }
 
 
     /*    public void placeObject(){
@@ -352,34 +458,33 @@ public class RobotAuto extends LinearOpMode {
     }
 */
     public void auto(){
-        int pos;
-        move(18);
-        if (objectInFront()){
+            int pos;
+            move(18);
+            if (objectInFront()){
             pos = 1;
             pushPixel();
             turn(-Math.PI/2);
             move(23);
-        } else {
+            } else {
             turn(-Math.PI/2);
             move(22);
             turn(Math.PI/2);
             if(objectInFront()){
-                pos = 2;
-                pushPixel();
-                turn(-Math.PI/2);
+            pos = 2;
+            pushPixel();
+            turn(-Math.PI/2);
             } else {
-                move(13);
-                turn(Math.PI/2);
-                move(6);
-                pos = 3;
-                pushPixel();
-                turn(-Math.PI/2);
-                move(-13);
-                turn(-Math.PI/2);
-                move(6);
+            move(13);
+            turn(Math.PI/2);
+            move(6);
+            pos = 3;
+            pushPixel();
+            turn(-Math.PI/2);
+            move(-13);
+            turn(-Math.PI/2);
+            move(6);
             }
 
-        }
+            }
 
-    }
-}
+            }}
