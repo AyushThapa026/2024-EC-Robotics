@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -63,6 +66,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -70,7 +75,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
+import org.tensorflow.lite.task.vision.detector.Detection;
+
 import java.util.*;
 @Autonomous(name="Auto", group="Robot")
 public class RobotAuto extends LinearOpMode {
@@ -93,6 +102,7 @@ public class RobotAuto extends LinearOpMode {
 
     private VisionPortal visionPortal;
 
+    private AprilTagProcessor aprilTag;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -116,6 +126,37 @@ public class RobotAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+
+            initAprilTag();
+
+            // Wait for the DS start button to be touched.
+            telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
+            telemetry.addData(">", "Touch Play to start OpMode");
+            telemetry.update();
+            waitForStart();
+
+            if (opModeIsActive()) {
+                    while (opModeIsActive()) {
+
+                            AprilTag();
+
+                            // Push telemetry to the Driver Station.
+                            telemetry.update();
+
+                            // Save CPU resources; can resume streaming when needed.
+                            if (gamepad1.dpad_down) {
+                                    visionPortal.stopStreaming();
+                            } else if (gamepad1.dpad_up) {
+                                    visionPortal.resumeStreaming();
+                            }
+
+                            // Share the CPU.
+                            sleep(20);
+                    }
+            }
+
+            // Save more CPU resources when camera is no longer needed.
+            visionPortal.close();
 
             BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
             parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -189,6 +230,201 @@ public class RobotAuto extends LinearOpMode {
 
             auto();
             }
+
+        private void initAprilTag() {
+
+                // Create the AprilTag processor.
+                aprilTag = new AprilTagProcessor.Builder()
+                        //.setDrawAxes(false)
+                        //.setDrawCubeProjection(false)
+                        //.setDrawTagOutline(true)
+                        //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+                        //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
+                        //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+
+                        // == CAMERA CALIBRATION ==
+                        // If you do not manually specify calibration parameters, the SDK will attempt
+                        // to load a predefined calibration for your camera.
+                        //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
+
+                        // ... these parameters are fx, fy, cx, cy.
+
+                        .build();
+
+                // Create the vision portal by using a builder.
+                VisionPortal.Builder builder = new VisionPortal.Builder();
+
+                // Set the camera (webcam vs. built-in RC phone camera).
+                builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam"));
+                // Choose a camera resolution. Not all cameras support all resolutions.
+                //builder.setCameraResolution(new Size(640, 480));
+
+                // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
+                //builder.enableCameraMonitoring(true);
+
+                // Set the stream format; MJPEG uses less bandwidth than default YUY2.
+                //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
+
+                // Choose whether or not LiveView stops if no processors are enabled.
+                // If set "true", monitor shows solid orange screen if no processors enabled.
+                // If set "false", monitor shows camera view without annotations.
+                //builder.setAutoStopLiveView(false);
+
+                // Set and enable the processor.
+                builder.addProcessor(aprilTag);
+
+                // Build the Vision Portal, using the above settings.
+                visionPortal = builder.build();
+
+                // Disable or re-enable the aprilTag processor at any time.
+                //visionPortal.setProcessorEnabled(aprilTag, true);
+
+        }   // end method initAprilTag()
+
+
+        /**
+         * Add telemetry about AprilTag detections.
+         */
+        private String AprilTag() {
+                List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+                List<Integer> AprilTagIDS = new List<Integer>() {
+                        @Override
+                        public int size() {
+                                return 0;
+                        }
+
+                        @Override
+                        public boolean isEmpty() {
+                                return false;
+                        }
+
+                        @Override
+                        public boolean contains(@Nullable Object o) {
+                                return false;
+                        }
+
+                        @NonNull
+                        @Override
+                        public Iterator<Integer> iterator() {
+                                return null;
+                        }
+
+                        @NonNull
+                        @Override
+                        public Object[] toArray() {
+                                return new Object[0];
+                        }
+
+                        @NonNull
+                        @Override
+                        public <T> T[] toArray(@NonNull T[] ts) {
+                                return null;
+                        }
+
+                        @Override
+                        public boolean add(Integer integer) {
+                                return false;
+                        }
+
+                        @Override
+                        public boolean remove(@Nullable Object o) {
+                                return false;
+                        }
+
+                        @Override
+                        public boolean containsAll(@NonNull Collection<?> collection) {
+                                return false;
+                        }
+
+                        @Override
+                        public boolean addAll(@NonNull Collection<? extends Integer> collection) {
+                                return false;
+                        }
+
+                        @Override
+                        public boolean addAll(int i, @NonNull Collection<? extends Integer> collection) {
+                                return false;
+                        }
+
+                        @Override
+                        public boolean removeAll(@NonNull Collection<?> collection) {
+                                return false;
+                        }
+
+                        @Override
+                        public boolean retainAll(@NonNull Collection<?> collection) {
+                                return false;
+                        }
+
+                        @Override
+                        public void clear() {
+
+                        }
+
+                        @Override
+                        public Integer get(int i) {
+                                return null;
+                        }
+
+                        @Override
+                        public Integer set(int i, Integer integer) {
+                                return null;
+                        }
+
+                        @Override
+                        public void add(int i, Integer integer) {
+
+                        }
+
+                        @Override
+                        public Integer remove(int i) {
+                                return null;
+                        }
+
+                        @Override
+                        public int indexOf(@Nullable Object o) {
+                                return 0;
+                        }
+
+                        @Override
+                        public int lastIndexOf(@Nullable Object o) {
+                                return 0;
+                        }
+
+                        @NonNull
+                        @Override
+                        public ListIterator<Integer> listIterator() {
+                                return null;
+                        }
+
+                        @NonNull
+                        @Override
+                        public ListIterator<Integer> listIterator(int i) {
+                                return null;
+                        }
+
+                        @NonNull
+                        @Override
+                        public List<Integer> subList(int i, int i1) {
+                                return null;
+                        }
+                };
+                for(AprilTagDetection detection : currentDetections){
+                        AprilTagIDS.add(detection.id);
+                }
+                for(Integer i : AprilTagIDS) {
+                        if (true /*Change this to an ID*/) {
+                                return "Right";
+                        }
+                        if (true /*Change this to an ID*/) {
+                                return "Left";
+                        }
+                        if (true /*Change this to an ID*/) {
+                                return "Forward";
+                        }
+                }
+                return "";
+        }   // end method telemetryAprilTag()
     public void turn(double radians){
             encoderDrive(TURN_SPEED, -(radians * 20.043971751969), (radians * 20.043971751969), 1000);
             }
@@ -213,8 +449,9 @@ public class RobotAuto extends LinearOpMode {
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             //angles.firstAngle is the heading angle
             }
+
     public void encoderStrafe(double speed,
-            double inches, // negative is left, positive is right
+            double inches, // negative is left, positive is right, probably
             double timeoutS) {
             int newFrontLeftTarget;
             int newFrontRightTarget;
