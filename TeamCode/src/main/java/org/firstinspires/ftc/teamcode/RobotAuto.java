@@ -127,7 +127,7 @@ public class RobotAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-            initAprilTag();
+            VisionClass.initAprilTag(hardwareMap.get(WebcamName.class, "Webcam 1"));
 
             // Wait for the DS start button to be touched.
             telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
@@ -138,7 +138,7 @@ public class RobotAuto extends LinearOpMode {
             if (opModeIsActive()) {
                     while (opModeIsActive()) {
 
-                            AprilTag();
+                            VisionClass.AprilTag();
 
                             // Push telemetry to the Driver Station.
                             telemetry.update();
@@ -231,200 +231,10 @@ public class RobotAuto extends LinearOpMode {
             auto();
             }
 
-        private void initAprilTag() {
-
-                // Create the AprilTag processor.
-                aprilTag = new AprilTagProcessor.Builder()
-                        //.setDrawAxes(false)
-                        //.setDrawCubeProjection(false)
-                        //.setDrawTagOutline(true)
-                        //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-                        //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
-                        //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-
-                        // == CAMERA CALIBRATION ==
-                        // If you do not manually specify calibration parameters, the SDK will attempt
-                        // to load a predefined calibration for your camera.
-                        //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
-
-                        // ... these parameters are fx, fy, cx, cy.
-
-                        .build();
-
-                // Create the vision portal by using a builder.
-                VisionPortal.Builder builder = new VisionPortal.Builder();
-
-                // Set the camera (webcam vs. built-in RC phone camera).
-                builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam"));
-                // Choose a camera resolution. Not all cameras support all resolutions.
-                //builder.setCameraResolution(new Size(640, 480));
-
-                // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-                //builder.enableCameraMonitoring(true);
-
-                // Set the stream format; MJPEG uses less bandwidth than default YUY2.
-                //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
-
-                // Choose whether or not LiveView stops if no processors are enabled.
-                // If set "true", monitor shows solid orange screen if no processors enabled.
-                // If set "false", monitor shows camera view without annotations.
-                //builder.setAutoStopLiveView(false);
-
-                // Set and enable the processor.
-                builder.addProcessor(aprilTag);
-
-                // Build the Vision Portal, using the above settings.
-                visionPortal = builder.build();
-
-                // Disable or re-enable the aprilTag processor at any time.
-                //visionPortal.setProcessorEnabled(aprilTag, true);
-
-        }   // end method initAprilTag()
-
 
         /**
          * Add telemetry about AprilTag detections.
          */
-        private String AprilTag() {
-                List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-                List<Integer> AprilTagIDS = new List<Integer>() {
-                        @Override
-                        public int size() {
-                                return 0;
-                        }
-
-                        @Override
-                        public boolean isEmpty() {
-                                return false;
-                        }
-
-                        @Override
-                        public boolean contains(@Nullable Object o) {
-                                return false;
-                        }
-
-                        @NonNull
-                        @Override
-                        public Iterator<Integer> iterator() {
-                                return null;
-                        }
-
-                        @NonNull
-                        @Override
-                        public Object[] toArray() {
-                                return new Object[0];
-                        }
-
-                        @NonNull
-                        @Override
-                        public <T> T[] toArray(@NonNull T[] ts) {
-                                return null;
-                        }
-
-                        @Override
-                        public boolean add(Integer integer) {
-                                return false;
-                        }
-
-                        @Override
-                        public boolean remove(@Nullable Object o) {
-                                return false;
-                        }
-
-                        @Override
-                        public boolean containsAll(@NonNull Collection<?> collection) {
-                                return false;
-                        }
-
-                        @Override
-                        public boolean addAll(@NonNull Collection<? extends Integer> collection) {
-                                return false;
-                        }
-
-                        @Override
-                        public boolean addAll(int i, @NonNull Collection<? extends Integer> collection) {
-                                return false;
-                        }
-
-                        @Override
-                        public boolean removeAll(@NonNull Collection<?> collection) {
-                                return false;
-                        }
-
-                        @Override
-                        public boolean retainAll(@NonNull Collection<?> collection) {
-                                return false;
-                        }
-
-                        @Override
-                        public void clear() {
-
-                        }
-
-                        @Override
-                        public Integer get(int i) {
-                                return null;
-                        }
-
-                        @Override
-                        public Integer set(int i, Integer integer) {
-                                return null;
-                        }
-
-                        @Override
-                        public void add(int i, Integer integer) {
-
-                        }
-
-                        @Override
-                        public Integer remove(int i) {
-                                return null;
-                        }
-
-                        @Override
-                        public int indexOf(@Nullable Object o) {
-                                return 0;
-                        }
-
-                        @Override
-                        public int lastIndexOf(@Nullable Object o) {
-                                return 0;
-                        }
-
-                        @NonNull
-                        @Override
-                        public ListIterator<Integer> listIterator() {
-                                return null;
-                        }
-
-                        @NonNull
-                        @Override
-                        public ListIterator<Integer> listIterator(int i) {
-                                return null;
-                        }
-
-                        @NonNull
-                        @Override
-                        public List<Integer> subList(int i, int i1) {
-                                return null;
-                        }
-                };
-                for(AprilTagDetection detection : currentDetections){
-                        AprilTagIDS.add(detection.id);
-                }
-                for(Integer i : AprilTagIDS) {
-                        if (true /*Change this to an ID*/) {
-                                return "Right";
-                        }
-                        if (true /*Change this to an ID*/) {
-                                return "Left";
-                        }
-                        if (true /*Change this to an ID*/) {
-                                return "Forward";
-                        }
-                }
-                return "";
-        }   // end method telemetryAprilTag()
     public void turn(double radians){
             encoderDrive(TURN_SPEED, -(radians * 20.043971751969), (radians * 20.043971751969), 1000);
             }
@@ -659,32 +469,6 @@ public class RobotAuto extends LinearOpMode {
             }
             }
 
-    public boolean objectInFront(){
-            //visionPortal.resumeStreaming();
-            List<Recognition> currentRecognitions = tfod.getRecognitions();
-            telemetry.addData("# Objects Detected", currentRecognitions.size());
-
-            // Step through the list of recognitions and display info for each one.
-            for (Recognition recognition : currentRecognitions) {
-            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
-            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
-
-            telemetry.addData(""," ");
-            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
-            telemetry.addData("- Position", "%.0f / %.0f", x, y);
-            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
-
-
-            if(recognition.getConfidence() > 0.7 && recognition.getLabel().equals("Pixel")) {
-            //visionPortal.stopStreaming();
-            return true;
-            }
-            }
-
-            //visionPortal.stopStreaming();
-            return false;
-            }
-
 
     /*    public void placeObject(){
         //TODO: Finish this
@@ -697,7 +481,7 @@ public class RobotAuto extends LinearOpMode {
     public void auto(){
             int pos;
             move(18);
-            if (objectInFront()){
+            if (VisionClass.objectInFront(telemetry, tfod)){
             pos = 1;
             pushPixel();
             turn(-Math.PI/2);
@@ -706,7 +490,7 @@ public class RobotAuto extends LinearOpMode {
             turn(-Math.PI/2);
             move(22);
             turn(Math.PI/2);
-            if(objectInFront()){
+            if(VisionClass.objectInFront(telemetry, tfod)){
             pos = 2;
             pushPixel();
             turn(-Math.PI/2);
