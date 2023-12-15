@@ -19,8 +19,18 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class VisionClass extends RobotAuto{
+
+    private static TfodProcessor tfod;
     private static AprilTagProcessor aprilTag;
     private static VisionPortal vision;
+
+    public static void initTfod(){
+        tfod = TfodProcessor.easyCreateWithDefaults();
+    }
+
+    public static TfodProcessor getTfod(){
+        return tfod;
+    }
     public static void initAprilTag(CameraName cameraName) {
 
         // Create the AprilTag processor.
@@ -204,7 +214,7 @@ public class VisionClass extends RobotAuto{
         return "";
     }   // end method telemetryAprilTag()
 
-    public static boolean objectInFront(Telemetry telemetry, TfodProcessor tfod){
+    public static boolean objectInFront(Telemetry telemetry){
         //visionPortal.resumeStreaming();
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());

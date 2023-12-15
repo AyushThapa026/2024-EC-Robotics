@@ -98,8 +98,6 @@ public class RobotAuto extends LinearOpMode {
     public Servo clawPush = null;
     public Servo clawDrop = null;
 
-    private TfodProcessor tfod;
-
     private VisionPortal visionPortal;
 
     private AprilTagProcessor aprilTag;
@@ -194,8 +192,8 @@ public class RobotAuto extends LinearOpMode {
             //upperArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             //lowerArmJoint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            tfod = TfodProcessor.easyCreateWithDefaults();
-            visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), tfod);
+            VisionClass.initTfod();
+            visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), VisionClass.getTfod());
             visionPortal.stopLiveView();
 
             // Send telemetry message to indicate successful Encoder reset
@@ -481,7 +479,7 @@ public class RobotAuto extends LinearOpMode {
     public void auto(){
             int pos;
             move(18);
-            if (VisionClass.objectInFront(telemetry, tfod)){
+            if (VisionClass.objectInFront(telemetry)){
             pos = 1;
             pushPixel();
             turn(-Math.PI/2);
@@ -490,7 +488,7 @@ public class RobotAuto extends LinearOpMode {
             turn(-Math.PI/2);
             move(22);
             turn(Math.PI/2);
-            if(VisionClass.objectInFront(telemetry, tfod)){
+            if(VisionClass.objectInFront(telemetry)){
             pos = 2;
             pushPixel();
             turn(-Math.PI/2);
