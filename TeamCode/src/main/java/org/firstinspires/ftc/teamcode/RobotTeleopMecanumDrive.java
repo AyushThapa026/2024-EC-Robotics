@@ -65,6 +65,8 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public Servo clawRotation = null;
 
     public DcMotor suspensionMotor = null;
+
+    public DcMotor armRotation = null;
     public Servo claw = null;
 
     public Servo airplaneServo = null;
@@ -96,7 +98,10 @@ public class RobotTeleopMecanumDrive extends OpMode{
         rearLeft = hardwareMap.dcMotor.get("left_rear_drive");
         rearRight = hardwareMap.dcMotor.get("right_rear_drive");
 
+        //armRotation = hardwareMap.dcMotor.get("arm_rotation");
+
         airplaneServo = hardwareMap.servo.get("airplane_servo");
+        //claw = hardwareMap.servo.get("claw");
         suspensionMotor = hardwareMap.dcMotor.get("suspension_motor");
 
         //this needs to be corrected with testing, this is just and example
@@ -117,13 +122,9 @@ public class RobotTeleopMecanumDrive extends OpMode{
     /*
      * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
      */
-
-    private int issueLevel = 0;
     @Override
     public void init_loop() {
-        telemetry.addData("Issue level: ", issueLevel);
         telemetry.update();
-        issueLevel++;
     }
 
     /*
@@ -147,7 +148,29 @@ public class RobotTeleopMecanumDrive extends OpMode{
             driveSpeed = 0.5;
         }
     }
+/*
+    public void armMovementLoop(){
+        double armRotat = (double)gamepad2.left_stick_y * 0.1; //0.1 is an arbitary
+        //when we implement this, comment out the suspension arm loop
+        double susArm = (double)gamepad1.right_stick_y;
 
+        if(gamepad2.a)
+            claw.setPosition(0.3);
+        else if (gamepad2.b)
+            claw.setPosition(1.0);
+
+        if (gamepad2.y) {
+            // Turn On RUN_TO_POSITION
+            isSuspended = true;
+            while (true) {
+                suspensionMotor.setPower(-1);
+            }
+        }
+
+        armRotation.setPower(armRotat);
+        suspensionMotor.setPower(susArm);
+    }
+*/
     public void wheelMovementLoop() {
         // Using trig to set the motor speeds so that the bot can move in all directions
         double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
