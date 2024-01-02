@@ -388,9 +388,13 @@ public class RobotAuto extends LinearOpMode {
 
             }
 
-    public void dropPixel(){
+    public void dropPixel() {
 
-            }
+    }
+
+    public void  gyroTurn(boolean isRight, double speed){
+
+    }
     public void encoderDrive(double speed,
             double leftInches, double rightInches,
             double timeoutS) {
