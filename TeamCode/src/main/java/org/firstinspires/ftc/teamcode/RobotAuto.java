@@ -140,4 +140,12 @@ public class RobotAuto extends LinearOpMode {
             sleep(250);   // optional pause after each move.
         }
     }
+
+    private void runAutonomous() {
+        // Locate team object
+        // Get team object
+        // Go to backboard
+        // Place pixel on backboard
+        // Move out of the way
+    }
 }
