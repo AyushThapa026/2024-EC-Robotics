@@ -148,7 +148,9 @@ public class RobotAuto extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        auto();
+        //auto();
+        while(true)
+            objectInFront();
     }
     public void turn(double radians){
         encoderDrive(TURN_SPEED, -(radians * 20.043971751969), (radians * 20.043971751969), 1000);
@@ -256,6 +258,7 @@ public class RobotAuto extends LinearOpMode {
         visionPortal.setProcessorEnabled(tfod, true);
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());
+        telemetry.update();
 
         // Step through the list of recognitions and display info for each one.
         for (Recognition recognition : currentRecognitions) {
@@ -266,6 +269,7 @@ public class RobotAuto extends LinearOpMode {
             telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
             telemetry.addData("- Position", "%.0f / %.0f", x, y);
             telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
+            telemetry.update();
 
 
             if(recognition.getConfidence() > 0.7 && recognition.getLabel().equals("Pixel")) {

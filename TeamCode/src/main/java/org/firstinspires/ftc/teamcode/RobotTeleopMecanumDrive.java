@@ -62,14 +62,17 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public DcMotor  frontRight  = null;
     public DcMotor  rearLeft    = null;
     public DcMotor  rearRight   = null;
-    public Servo clawRotation = null;
+    public DcMotor  armJoint = null;
+
+    public Servo clawA = null;
+    public Servo clawB = null;
 
     public DcMotor suspensionMotor = null;
 
     public DcMotor armRotation = null;
     public Servo claw = null;
 
-    public Servo airplaneServo = null;
+    public DcMotor airplaneMotor = null;
 
     private ElapsedTime runtime = new ElapsedTime();
     static final double     COUNTS_PER_MOTOR_REV    = 537.7;    // eg: TETRIX Motor Encoder
@@ -98,10 +101,17 @@ public class RobotTeleopMecanumDrive extends OpMode{
         rearLeft = hardwareMap.dcMotor.get("left_rear_drive");
         rearRight = hardwareMap.dcMotor.get("right_rear_drive");
 
+<<<<<<< Updated upstream
         //armRotation = hardwareMap.dcMotor.get("arm_rotation");
 
         airplaneServo = hardwareMap.servo.get("airplane_servo");
         //claw = hardwareMap.servo.get("claw");
+=======
+        airplaneMotor = hardwareMap.dcMotor.get("airplane_motor");
+        clawA = hardwareMap.servo.get("Claw_A");
+        clawB = hardwareMap.servo.get("Claw_B");
+        armJoint = hardwareMap.dcMotor.get("arm_joint");
+>>>>>>> Stashed changes
         suspensionMotor = hardwareMap.dcMotor.get("suspension_motor");
 
         //this needs to be corrected with testing, this is just and example
@@ -133,11 +143,12 @@ public class RobotTeleopMecanumDrive extends OpMode{
     @Override
     public void start() {}
 
-    public void servoMovementLoop() {
-        if (gamepad1.x) {
-            airplaneServo.setPosition(1);
+    public void airplaneMovementLoop() {
+        if (gamepad2.x) {
+            airplaneMotor.setPower(0.2);
             telemetry.addData("x DOWN", "");
         }
+        else airplaneMotor.setPower(0);
         telemetry.update();
     }
 
@@ -193,6 +204,18 @@ public class RobotTeleopMecanumDrive extends OpMode{
         telemetry.addData("rightRear", "%.2f", rightRearWheelPower);
     }
 
+    public void armMovementLoop(){
+        if(gamepad2.a){
+            clawA.setPosition(0.5);
+            clawB.setPosition(0.5);
+        }
+        if(gamepad2.b){
+            clawA.setPosition(1);
+            clawB.setPosition(1); // chose position values randomly, test and change
+        }
+
+        armJoint.setPower(gamepad2.left_stick_y * 0.3);
+    }
     public void suspensionLoop() {
         if (!isSuspended) {
             if (gamepad1.y) {
@@ -226,6 +249,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
     @Override
     public void loop() {
         wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
+        armMovementLoop();
         servoMovementLoop();
         suspensionLoop();
         sprintInput();
