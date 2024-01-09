@@ -241,6 +241,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
         armMovementLoop();
         suspensionLoop();
         sprintInput();
+        airplaneMovementLoop();
     }
 
     /*
