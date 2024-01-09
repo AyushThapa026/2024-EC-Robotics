@@ -101,6 +101,11 @@ public class RobotTeleopMecanumDrive extends OpMode{
         rearLeft = hardwareMap.dcMotor.get("left_rear_drive");
         rearRight = hardwareMap.dcMotor.get("right_rear_drive");
 
+
+        //armRotation = hardwareMap.dcMotor.get("arm_rotation");
+
+        //claw = hardwareMap.servo.get("claw");
+
         airplaneMotor = hardwareMap.dcMotor.get("airplane_motor");
         clawA = hardwareMap.servo.get("Claw_A");
         clawB = hardwareMap.servo.get("Claw_B");
@@ -234,7 +239,6 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public void loop() {
         wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
         armMovementLoop();
-        airplaneMovementLoop();
         suspensionLoop();
         sprintInput();
     }
