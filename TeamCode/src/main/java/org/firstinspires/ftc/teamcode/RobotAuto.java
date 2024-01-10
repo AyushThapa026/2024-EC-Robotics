@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -19,6 +20,7 @@ public class RobotAuto extends LinearOpMode {
     public DcMotor  rearRight   = null;
     public Servo clawPush = null;
     public Servo clawDrop = null;
+    public TouchSensor touchSensor = null;
     private ElapsedTime runtime = new ElapsedTime();
     static final double     COUNTS_PER_MOTOR_REV    = 537.7;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0;     // No External Gearing.
@@ -27,7 +29,6 @@ public class RobotAuto extends LinearOpMode {
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     DRIVE_SPEED             = 0.3;
     static final double     TURN_SPEED              = 0.3;
-    public VisionAuto VisionClassAuto;
     @Override
     public void runOpMode() {
         // Initialize the drive system variables.
@@ -35,7 +36,9 @@ public class RobotAuto extends LinearOpMode {
         frontRight = hardwareMap.dcMotor.get("right_front_drive");
         rearLeft = hardwareMap.dcMotor.get("left_rear_drive");
         rearRight = hardwareMap.dcMotor.get("right_rear_drive");
-        clawPush = hardwareMap.servo.get("pixel_push");
+        //clawPush = hardwareMap.servo.get("pixel_push");
+
+        touchSensor = hardwareMap.touchSensor.get("touch_sensor");
 
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
@@ -57,6 +60,12 @@ public class RobotAuto extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+
+        while(opModeIsActive()){
+            telemetry.addData("if it is touching:", touchSensor.getValue());
+            telemetry.update();
+        }
+        //runAutonomous();
     }
 
     private void turn(double radians){
@@ -141,11 +150,69 @@ public class RobotAuto extends LinearOpMode {
         }
     }
 
+    private boolean isTouching() {
+        return touchSensor.isPressed();
+    }
+
+    private void findTeamObject() {
+        move(14);
+        turn(Math.PI/2.62);
+        move(6);
+        turn(-Math.PI/2.62);
+        move(12);
+        if(isTouching()==true){
+
+            turn(-Math.PI/2.62);
+            move(6);
+            turn(Math.PI/2.62);
+            move(-24);
+        }else{
+            if(isTouching()==true){
+
+                turn(-Math.PI/2.62);
+                turn(-Math.PI/2.62);
+                move(6);
+                turn(-Math.PI/2.62);
+                move(-24);
+            }else{
+
+                turn(-Math.PI/2.62);
+                move(6);
+                turn(-Math.PI/2.62);
+                move(-24);
+            }
+        }
+
+    }
+
+    private void pickTeamObject() {
+
+    }
+
+    private void goToBackboard() {
+
+    }
+
+    private void placePixelOnBackboard() {
+
+    }
+
+    private void moveOutOfWay() {
+
+    }
+
+
+
     private void runAutonomous() {
         // Locate team object
-        // Get team object
+        findTeamObject();
+        // Pick up team object
+
         // Go to backboard
+        goToBackboard();
         // Place pixel on backboard
+        placePixelOnBackboard();
         // Move out of the way
+        moveOutOfWay();
     }
 }
