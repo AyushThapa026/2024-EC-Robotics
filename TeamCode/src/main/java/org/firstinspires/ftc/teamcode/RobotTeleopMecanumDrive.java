@@ -107,10 +107,10 @@ public class RobotTeleopMecanumDrive extends OpMode{
         //claw = hardwareMap.servo.get("claw");
 
         airplaneMotor = hardwareMap.dcMotor.get("airplane_motor");
-        clawA = hardwareMap.servo.get("Claw_A");
-        clawB = hardwareMap.servo.get("Claw_B");
+        //clawA = hardwareMap.servo.get("Claw_A");
+        //clawB = hardwareMap.servo.get("Claw_B");
         armJoint = hardwareMap.dcMotor.get("arm_joint");
-        suspensionMotor = hardwareMap.dcMotor.get("suspension_motor");
+        //suspensionMotor = hardwareMap.dcMotor.get("suspension_motor");
 
         //this needs to be corrected with testing, this is just and example
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
@@ -118,10 +118,10 @@ public class RobotTeleopMecanumDrive extends OpMode{
         rearLeft.setDirection(DcMotor.Direction.REVERSE);
         rearRight.setDirection(DcMotor.Direction.FORWARD);
 
-        suspensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //suspensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        suspensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        suspensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //suspensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //suspensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData(">", "Robot Ready.  Press Play.");    //
@@ -215,6 +215,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
         armJoint.setPower(gamepad2.left_stick_y * 0.3);
     }
     public void suspensionLoop() {
+        /*
         if (!isSuspended) {
             if (gamepad2.y) {
                 // Turn On RUN_TO_POSITION
@@ -230,18 +231,18 @@ public class RobotTeleopMecanumDrive extends OpMode{
                 suspensionMotor.setPower(0);
             }
         }
-
+         */
     }
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
     @Override
     public void loop() {
-        wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
+        //wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
         armMovementLoop();
-        suspensionLoop();
-        sprintInput();
-        airplaneMovementLoop();
+        //suspensionLoop();
+        //sprintInput();
+        //airplaneMovementLoop();
     }
 
     /*
