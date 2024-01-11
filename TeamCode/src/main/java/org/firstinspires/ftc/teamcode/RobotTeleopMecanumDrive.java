@@ -107,8 +107,13 @@ public class RobotTeleopMecanumDrive extends OpMode{
         //claw = hardwareMap.servo.get("claw");
 
         airplaneMotor = hardwareMap.dcMotor.get("airplane_motor");
+<<<<<<< HEAD
         //clawA = hardwareMap.servo.get("Claw_A");
         //clawB = hardwareMap.servo.get("Claw_B");
+=======
+        clawA = hardwareMap.servo.get("claw_A");
+        clawB = hardwareMap.servo.get("claw_B");
+>>>>>>> 6bc3f0fffa9828c0dea0d61fe7a25421ef0df8bd
         armJoint = hardwareMap.dcMotor.get("arm_joint");
         //suspensionMotor = hardwareMap.dcMotor.get("suspension_motor");
 
@@ -212,7 +217,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
             clawB.setPosition(1); // chose position values randomly, test and change
         }
 
-        armJoint.setPower(gamepad2.left_stick_y * 0.3);
+        armJoint.setPower(gamepad2.left_stick_y);
     }
     public void suspensionLoop() {
         /*
