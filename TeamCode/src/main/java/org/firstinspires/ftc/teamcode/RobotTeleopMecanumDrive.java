@@ -57,21 +57,26 @@ import com.qualcomm.robotcore.*;
 public class RobotTeleopMecanumDrive extends OpMode{
 
     /* Declare OpMode members. */
-
     public DcMotor  frontLeft   = null;
     public DcMotor  frontRight  = null;
     public DcMotor  rearLeft    = null;
     public DcMotor  rearRight   = null;
+
     public DcMotor  armJoint = null;
 
-    public Servo clawA = null;
-    public Servo clawB = null;
+    public Servo clawRotation = null;
+
 
     public DcMotor suspensionMotor = null;
 
     public DcMotor armRotation = null;
     public Servo claw = null;
 
+    public DcMotor airplaneMotor = null;
+  
+    public DcMotor  armJoint = null;
+    public Servo clawA = null;
+    public Servo clawB = null;
     public DcMotor airplaneMotor = null;
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -93,29 +98,22 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public void init() {
         // Define and Initialize Motors
 
-        //TODO: Set up hardwareMap
-        //drive base
-
+        //Drive base
         frontLeft  = hardwareMap.dcMotor.get("left_front_drive");
         frontRight = hardwareMap.dcMotor.get("right_front_drive");
         rearLeft = hardwareMap.dcMotor.get("left_rear_drive");
         rearRight = hardwareMap.dcMotor.get("right_rear_drive");
 
-
-        //armRotation = hardwareMap.dcMotor.get("arm_rotation");
-
-        //claw = hardwareMap.servo.get("claw");
-
-        airplaneMotor = hardwareMap.dcMotor.get("airplane_motor");
-<<<<<<< HEAD
         //clawA = hardwareMap.servo.get("Claw_A");
         //clawB = hardwareMap.servo.get("Claw_B");
-=======
+
         clawA = hardwareMap.servo.get("claw_A");
         clawB = hardwareMap.servo.get("claw_B");
->>>>>>> 6bc3f0fffa9828c0dea0d61fe7a25421ef0df8bd
         armJoint = hardwareMap.dcMotor.get("arm_joint");
         //suspensionMotor = hardwareMap.dcMotor.get("suspension_motor");
+        airplaneMotor = hardwareMap.dcMotor.get("airplane_motor");
+
+        suspensionMotor = hardwareMap.dcMotor.get("suspension_motor");
 
         //this needs to be corrected with testing, this is just and example
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
