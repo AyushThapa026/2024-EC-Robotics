@@ -61,11 +61,7 @@ public class RobotAuto extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        while(opModeIsActive()){
-            telemetry.addData("if it is touching:", touchSensor.getValue());
-            telemetry.update();
-        }
-        //runAutonomous();
+        runAutonomous();
     }
 
     private void turn(double radians){
@@ -200,8 +196,6 @@ public class RobotAuto extends LinearOpMode {
     private void moveOutOfWay() {
 
     }
-
-
 
     private void runAutonomous() {
         // Locate team object
