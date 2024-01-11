@@ -146,10 +146,6 @@ public class RobotAuto extends LinearOpMode {
         }
     }
 
-    private boolean isTouching() {
-        return touchSensor.isPressed();
-    }
-
     private void findTeamObject() {
         move(14);
         turn(Math.PI/2.62);
