@@ -146,7 +146,7 @@ public class RobotAuto extends LinearOpMode {
         }
     }
 
-    private boolean isTouching() {
+    private boolean isTouching() { // returns if the touch sensor is pressed
         return touchSensor.isPressed();
     }
 
