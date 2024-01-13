@@ -68,16 +68,12 @@ public class RobotTeleopMecanumDrive extends OpMode{
 
 
     public DcMotor suspensionMotor = null;
-
     public DcMotor armRotation = null;
     public Servo claw = null;
 
     public DcMotor airplaneMotor = null;
-  
-    public DcMotor  armJoint = null;
     public Servo clawA = null;
     public Servo clawB = null;
-    public DcMotor airplaneMotor = null;
 
     private ElapsedTime runtime = new ElapsedTime();
     static final double     COUNTS_PER_MOTOR_REV    = 537.7;    // eg: TETRIX Motor Encoder
@@ -110,7 +106,6 @@ public class RobotTeleopMecanumDrive extends OpMode{
         clawA = hardwareMap.servo.get("claw_A");
         clawB = hardwareMap.servo.get("claw_B");
         armJoint = hardwareMap.dcMotor.get("arm_joint");
-        //suspensionMotor = hardwareMap.dcMotor.get("suspension_motor");
         airplaneMotor = hardwareMap.dcMotor.get("airplane_motor");
 
         suspensionMotor = hardwareMap.dcMotor.get("suspension_motor");
@@ -160,29 +155,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
             driveSpeed = 0.5;
         }
     }
-/*
-    public void armMovementLoop(){
-        double armRotat = (double)gamepad2.left_stick_y * 0.1; //0.1 is an arbitary
-        //when we implement this, comment out the suspension arm loop
-        double susArm = (double)gamepad1.right_stick_y;
 
-        if(gamepad2.a)
-            claw.setPosition(0.3);
-        else if (gamepad2.b)
-            claw.setPosition(1.0);
-
-        if (gamepad2.y) {
-            // Turn On RUN_TO_POSITION
-            isSuspended = true;
-            while (true) {
-                suspensionMotor.setPower(-1);
-            }
-        }
-
-        armRotation.setPower(armRotat);
-        suspensionMotor.setPower(susArm);
-    }
-*/
     public void wheelMovementLoop() {
         // Using trig to set the motor speeds so that the bot can move in all directions
         double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
@@ -206,11 +179,11 @@ public class RobotTeleopMecanumDrive extends OpMode{
     }
 
     public void armMovementLoop(){
-        if(gamepad2.a){
+        if(gamepad2.left_bumper){
             clawA.setPosition(0.5);
             clawB.setPosition(0.5);
         }
-        if(gamepad2.b){
+        if(gamepad2.right_bumper){
             clawA.setPosition(1);
             clawB.setPosition(1); // chose position values randomly, test and change
         }
@@ -218,7 +191,6 @@ public class RobotTeleopMecanumDrive extends OpMode{
         armJoint.setPower(gamepad2.left_stick_y);
     }
     public void suspensionLoop() {
-        /*
         if (!isSuspended) {
             if (gamepad2.y) {
                 // Turn On RUN_TO_POSITION
@@ -234,18 +206,17 @@ public class RobotTeleopMecanumDrive extends OpMode{
                 suspensionMotor.setPower(0);
             }
         }
-         */
     }
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
     @Override
     public void loop() {
-        //wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
+        wheelMovementLoop(); // Control the movement of the mecanum wheels using gamepad1
         armMovementLoop();
-        //suspensionLoop();
-        //sprintInput();
-        //airplaneMovementLoop();
+        suspensionLoop();
+        sprintInput();
+        airplaneMovementLoop();
     }
 
     /*
