@@ -149,11 +149,16 @@ public class RobotTeleopMecanumDrive extends OpMode{
     }
 
     public void sprintInput() {
-        if (gamepad1.left_bumper) {
-            driveSpeed = 1;
-        } else {
-            driveSpeed = 0.5;
+        boolean sprint = driveSpeed > 0.7;
+        if(gamepad1.left_stick_button){
+            sprint = !sprint;
         }
+
+        if(sprint){
+            driveSpeed = 1;
+        } else
+            driveSpeed = 0.5;
+        telemetry.addData("driveSpeed", driveSpeed);
     }
 
     public void wheelMovementLoop() {
@@ -180,15 +185,17 @@ public class RobotTeleopMecanumDrive extends OpMode{
 
     public void armMovementLoop(){
         if(gamepad2.left_bumper){
-            clawA.setPosition(0.5);
-            clawB.setPosition(0.5);
+            clawA.setPosition(0);
+            clawB.setPosition(0);
         }
         if(gamepad2.right_bumper){
             clawA.setPosition(1);
             clawB.setPosition(1); // chose position values randomly, test and change
         }
 
-        armJoint.setPower(gamepad2.left_stick_y);
+        armJoint.setPower(gamepad2.left_stick_y *0.3);
+        if(gamepad2.right_stick_y != 0)
+            armJoint.setPower(gamepad2.right_stick_y *0.1);
     }
     public void suspensionLoop() {
         if (!isSuspended) {
@@ -217,6 +224,7 @@ public class RobotTeleopMecanumDrive extends OpMode{
         suspensionLoop();
         sprintInput();
         airplaneMovementLoop();
+        telemetry.update();
     }
 
     /*

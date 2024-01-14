@@ -18,9 +18,9 @@ public class RobotAuto extends LinearOpMode {
     public DcMotor  frontRight  = null;
     public DcMotor  rearLeft    = null;
     public DcMotor  rearRight   = null;
-    public Servo clawPush = null;
-    public Servo clawDrop = null;
     public TouchSensor touchSensor = null;
+    public Servo clawA = null;
+    public Servo clawB = null;
     private ElapsedTime runtime = new ElapsedTime();
     static final double     COUNTS_PER_MOTOR_REV    = 537.7;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0;     // No External Gearing.
@@ -36,7 +36,9 @@ public class RobotAuto extends LinearOpMode {
         frontRight = hardwareMap.dcMotor.get("right_front_drive");
         rearLeft = hardwareMap.dcMotor.get("left_rear_drive");
         rearRight = hardwareMap.dcMotor.get("right_rear_drive");
-        //clawPush = hardwareMap.servo.get("pixel_push");
+
+        clawA = hardwareMap.servo.get("claw_A");
+        clawB = hardwareMap.servo.get("claw_B");
 
         touchSensor = hardwareMap.touchSensor.get("touch_sensor");
 
@@ -49,6 +51,7 @@ public class RobotAuto extends LinearOpMode {
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Starting at",  "%7d :%7d",
@@ -74,12 +77,6 @@ public class RobotAuto extends LinearOpMode {
 
     private double radiansToCounts(double r) {
         return (COUNTS_PER_MOTOR_REV / (2 * Math.PI)) * r;
-    }
-
-    public void pushPixel(){
-        move(4);
-        clawPush.setPosition(0); // TODO: Find the actual position
-        move(-4);
     }
 
     private void encoderDrive(double speed,
@@ -181,8 +178,9 @@ public class RobotAuto extends LinearOpMode {
 
     }
 
-    private void pickTeamObject() {
-
+    private void placePixelOnFloor() {
+        clawA.setPosition(0.5);
+        clawB.setPosition(0.5);
     }
 
     private void goToBackboard() {
@@ -200,8 +198,8 @@ public class RobotAuto extends LinearOpMode {
     private void runAutonomous() {
         // Locate team object
         findTeamObject();
-        // Pick up team object
-
+        // Put down pixel
+        placePixelOnFloor();
         // Go to backboard
         goToBackboard();
         // Place pixel on backboard
