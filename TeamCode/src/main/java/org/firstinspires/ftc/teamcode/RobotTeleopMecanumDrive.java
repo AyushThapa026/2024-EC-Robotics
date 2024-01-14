@@ -186,14 +186,14 @@ public class RobotTeleopMecanumDrive extends OpMode{
     public void armMovementLoop(){
         if(gamepad2.left_bumper){
             clawA.setPosition(0);
-            clawB.setPosition(0);
+            clawB.setPosition(1);
         }
         if(gamepad2.right_bumper){
             clawA.setPosition(1);
-            clawB.setPosition(1); // chose position values randomly, test and change
+            clawB.setPosition(0.5); // chose position values randomly, test and change
         }
 
-        armJoint.setPower(gamepad2.left_stick_y *0.3);
+        armJoint.setPower(gamepad2.left_stick_y *0.6);
         if(gamepad2.right_stick_y != 0)
             armJoint.setPower(gamepad2.right_stick_y *0.1);
     }
