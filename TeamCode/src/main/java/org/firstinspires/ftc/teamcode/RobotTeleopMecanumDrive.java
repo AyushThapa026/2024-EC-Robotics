@@ -116,6 +116,8 @@ public class RobotTeleopMecanumDrive extends OpMode{
         rearLeft.setDirection(DcMotor.Direction.REVERSE);
         rearRight.setDirection(DcMotor.Direction.FORWARD);
 
+        suspensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
         //suspensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //suspensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
